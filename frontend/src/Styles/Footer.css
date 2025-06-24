@@ -1,0 +1,19 @@
+.footer {
+  margin-top: auto;
+  padding: 1.5rem 0;
+  text-align: center;
+  background: rgba(20, 30, 48, 0.85);
+  color: #b3b9d1;
+  font-size: 1rem;
+  border-top: 1px solid #2e3a59;
+  width: 100%;
+  box-sizing: border-box;
+  transition: padding 0.2s, font-size 0.2s;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
