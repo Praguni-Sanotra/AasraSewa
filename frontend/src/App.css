@@ -1,7 +1,31 @@
+/* App.css */
+
+/* Reset & Root Setup */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout Wrapper */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+  color: #e0e6f7;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Other existing styles */
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -39,13 +63,4 @@
 
 .read-the-docs {
   color: #888;
-}
-
-.app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
-  color: #e0e6f7;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
 }

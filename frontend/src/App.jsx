@@ -1,22 +1,35 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+
 import Header from "./Components/Header";
 import HeroSection from "./Components/HeroSection";
 import Footer from "./Components/Footer";
-import Login from "./Pages/login";
-import Home from "./Pages/Home";
-import Host from "./Pages/Host"; // ✅ Import the Host component
 
+import Login from "./Pages/Login";
+import Home from "./Pages/Home";
+import Host from "./Pages/Host";
+import FamilySearch from "./Pages/FamilySearch";
+import Results from "./Pages/Results";
+import House from "./Pages/House";
+
+// Layout component
 const Layout = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Show Header only if not on login page */}
+    <div className="app-wrapper">
+      {/* Conditionally render Header */}
       {!isLoginPage && <Header />}
 
-      <main className="flex-grow">
+      {/* Main Content */}
+      <main className="app-main container">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route
@@ -28,23 +41,30 @@ const Layout = () => {
               </>
             }
           />
-          {/*  Added Host page route */}
           <Route path="/host" element={<Host />} />
+          <Route path="/familysearch" element={<FamilySearch />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/house" element={<House />} />
+
+          {/* 🚀 Redirect from old route */}
+          <Route path="/explore" element={<Navigate to="/familysearch" replace />} />
+
+          {/* ❌ 404 Not Found */}
+          <Route path="*" element={<h2 style={{ textAlign: "center" }}>404 - Page Not Found</h2>} />
         </Routes>
       </main>
 
-      {/* Show Footer only if not on login page */}
+      {/* Conditionally render Footer */}
       {!isLoginPage && <Footer />}
     </div>
   );
 };
 
-function App() {
-  return (
-    <Router>
-      <Layout />
-    </Router>
-  );
-}
+// App wrapper
+const App = () => (
+  <Router>
+    <Layout />
+  </Router>
+);
 
 export default App;

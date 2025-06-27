@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../Styles/Host.css"; // Assuming you have a CSS file for styling
 
 export default function HostPage() {
   const [formData, setFormData] = useState({
@@ -10,94 +11,61 @@ export default function HostPage() {
     price: "",
   });
 
-  const [images, setImages] = useState([]);
+  const [wallImages, setWallImages] = useState({
+    front: null,
+    back: null,
+    left: null,
+    right: null,
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 4) {
-      alert("You can only upload up to 4 images.");
-      return;
-    }
-    const newImages = files.map((file) => ({
+  const handleWallImageUpload = (e, wall) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageData = {
       file,
       url: URL.createObjectURL(file),
+    };
+
+    setWallImages((prev) => ({
+      ...prev,
+      [wall]: imageData,
     }));
-    setImages((prev) => [...prev, ...newImages]);
   };
 
-  const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+  const removeWallImage = (wall) => {
+    setWallImages((prev) => ({
+      ...prev,
+      [wall]: null,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted", formData, images);
-  };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "0.75rem",
-    marginBottom: "1rem",
-    borderRadius: "12px",
-    border: "1px solid #d1d5db",
-    fontSize: "1rem",
-    outline: "none",
-    transition: "0.3s",
-    background: "#ffffff",
+    if (!wallImages.front || !wallImages.back || !wallImages.left || !wallImages.right) {
+      alert("Please upload images for all 4 walls.");
+      return;
+    }
+
+    console.log("Form Submitted", formData, wallImages);
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#ffffff",
-        padding: "1rem",
-        color: "#000000",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "500px",
-          background: "rgba(255, 255, 255, 0.95)",
-          padding: "2rem",
-          borderRadius: "24px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-          border: "1px solid #e0e0e0",
-          backdropFilter: "blur(6px)",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            marginBottom: "0.5rem",
-            textAlign: "center",
-            color: "#1e3a8a",
-          }}
-        >
-          Become a <span style={{ color: "#3b82f6" }}>Host</span>
+    <div className="host-wrapper">
+      <div className="host-container">
+        <h2 className="host-title">
+          Become a <span className="highlight">Host</span>
         </h2>
-        <p
-          style={{
-            textAlign: "center",
-            color: "#6b7280",
-            marginBottom: "1.5rem",
-            fontSize: "1rem",
-          }}
-        >
+        <p className="host-subtitle">
           Share your space, earn money, and join our hosting community.
         </p>
 
-        <form onSubmit={handleSubmit}>
-          {/* Stacked inputs */}
+        <form onSubmit={handleSubmit} className="host-form">
           <input
             type="text"
             name="name"
@@ -105,7 +73,6 @@ export default function HostPage() {
             value={formData.name}
             onChange={handleChange}
             required
-            style={inputStyle}
           />
           <input
             type="email"
@@ -114,7 +81,6 @@ export default function HostPage() {
             value={formData.email}
             onChange={handleChange}
             required
-            style={inputStyle}
           />
           <input
             type="tel"
@@ -123,7 +89,6 @@ export default function HostPage() {
             value={formData.phone}
             onChange={handleChange}
             required
-            style={inputStyle}
           />
           <input
             type="text"
@@ -132,7 +97,6 @@ export default function HostPage() {
             value={formData.location}
             onChange={handleChange}
             required
-            style={inputStyle}
           />
           <input
             type="number"
@@ -142,7 +106,6 @@ export default function HostPage() {
             onChange={handleChange}
             required
             min="0"
-            style={inputStyle}
           />
           <textarea
             name="description"
@@ -151,114 +114,32 @@ export default function HostPage() {
             onChange={handleChange}
             required
             rows="4"
-            style={{
-              ...inputStyle,
-              resize: "none",
-              marginBottom: "1.5rem",
-            }}
           ></textarea>
 
-          {/* Image Upload */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              style={{
-                fontWeight: "600",
-                fontSize: "1rem",
-                marginBottom: "0.5rem",
-                display: "block",
-                color: "#374151",
-              }}
-            >
-              Upload up to 4 Images
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              style={{
-                marginBottom: "1rem",
-                fontSize: "0.9rem",
-                color: "#1f2937",
-              }}
-            />
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-                gap: "1rem",
-              }}
-            >
-              {images.map((img, index) => (
-                <div
-                  key={index}
-                  style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    borderRadius: "12px",
-                    border: "1px solid #e5e7eb",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  <img
-                    src={img.url}
-                    alt={`preview-${index}`}
-                    style={{
-                      width: "100%",
-                      height: "80px",
-                      objectFit: "cover",
-                      borderRadius: "12px",
-                    }}
+          <div className="image-upload-section">
+            <label>Upload Images for Each Wall</label>
+            {['front', 'back', 'left', 'right'].map((wall) => (
+              <div key={wall} className="wall-upload-box">
+                <label className="wall-label">{wall.charAt(0).toUpperCase() + wall.slice(1)} Wall:</label>
+                {wallImages[wall] ? (
+                  <div className="image-preview-box">
+                    <img src={wallImages[wall].url} alt={`${wall} wall`} />
+                    <button type="button" onClick={() => removeWallImage(wall)}>
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleWallImageUpload(e, wall)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    style={{
-                      position: "absolute",
-                      top: "5px",
-                      right: "5px",
-                      background: "#ffffffcc",
-                      border: "none",
-                      color: "#ef4444",
-                      fontWeight: "bold",
-                      padding: "0.25rem 0.5rem",
-                      borderRadius: "50%",
-                      cursor: "pointer",
-                      fontSize: "1rem",
-                    }}
-                    title="Remove"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: "0.85rem",
-              background: "linear-gradient(to right, #2563eb, #3b82f6)",
-              color: "white",
-              fontWeight: "bold",
-              borderRadius: "14px",
-              fontSize: "1.1rem",
-              border: "none",
-              cursor: "pointer",
-              transition: "0.3s",
-              boxShadow: "0 4px 14px rgba(59,130,246,0.4)",
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.background =
-                "linear-gradient(to right, #1d4ed8, #2563eb)")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.background =
-                "linear-gradient(to right, #2563eb, #3b82f6)")
-            }
-          >
+          <button type="submit" className="submit-button">
             Submit Property
           </button>
         </form>

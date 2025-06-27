@@ -1,0 +1,130 @@
+/* HostPage.css */
+
+.host-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background-color: #f8fafc;
+}
+
+.host-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.host-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  color: #1e3a8a;
+}
+
+.highlight {
+  color: #3b82f6;
+}
+
+.host-subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.host-form input,
+.host-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.host-form input:focus,
+.host-form textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.host-form textarea {
+  resize: none;
+}
+
+.image-upload-section label {
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.image-upload-section input[type="file"] {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 1rem;
+}
+
+.image-preview-box {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.image-preview-box img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.image-preview-box button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ffffffcc;
+  border: none;
+  color: #ef4444;
+  font-weight: bold;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(to right, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.submit-button:hover {
+  background: linear-gradient(to right, #1d4ed8, #2563eb);
+  transform: translateY(-1px);
+}
