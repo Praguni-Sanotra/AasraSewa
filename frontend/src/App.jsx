@@ -14,7 +14,6 @@ import Footer from "./Components/Footer";
 import Login from "./Pages/Login";
 import Home from "./Pages/Home";
 import Host from "./Pages/Host";
-import FamilySearch from "./Pages/FamilySearch";
 import Results from "./Pages/Results";
 import House from "./Pages/House";
 
@@ -42,12 +41,11 @@ const Layout = () => {
             }
           />
           <Route path="/host" element={<Host />} />
-          <Route path="/familysearch" element={<FamilySearch />} />
           <Route path="/results" element={<Results />} />
           <Route path="/house" element={<House />} />
 
           {/* 🚀 Redirect from old route */}
-          <Route path="/explore" element={<Navigate to="/familysearch" replace />} />
+          <Route path="/explore" element={<Navigate to="/home" replace />} />
 
           {/* ❌ 404 Not Found */}
           <Route path="*" element={<h2 style={{ textAlign: "center" }}>404 - Page Not Found</h2>} />

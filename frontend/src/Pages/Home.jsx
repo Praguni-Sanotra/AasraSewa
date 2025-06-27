@@ -6,7 +6,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleExplore = () => {
-    navigate("/explore");
+    navigate("/results");
   };
 
   const handleEmergency = () => {
