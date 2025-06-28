@@ -1,111 +1,85 @@
 .hero-section {
   position: relative;
-  margin-top: 6rem; /* Offsets fixed header */
-  padding: 3rem 1rem;
-  background-color: #ffffff;
-  color: #ffffff;
-  text-align: center;
-  overflow: hidden;
+  margin-top: 6rem; /* Equal to header height to prevent overlap */
   height: 70vh;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-/* Background Image Wrapper */
-.hero-bg-wrapper {
+/* Image wrapper behind everything */
+.hero-image-wrapper {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
 }
 
-/* Background Image */
+/* Full image with better brightness */
 .hero-bg-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.3; /* More transparency for better text visibility */
+  opacity: 0.95; /* Almost full brightness */
 }
 
-/* Dark overlay behind text for better readability */
+/* Optional dark overlay to improve text contrast */
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4); /* Semi-transparent black */
+  background: rgba(0, 0, 0, 0.1); /* Less dark = brighter image */
   z-index: 1;
 }
 
-/* Content stays on top */
+/* Text Content */
 .hero-content {
   position: relative;
   z-index: 2;
+  padding: 1rem;
   max-width: 800px;
-  padding: 0 1rem;
 }
 
-/* Heading */
+/* Heading styles */
 .hero-heading {
   font-family: "Poppins", sans-serif;
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1.5rem;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: #f3f4f6; /* Light gray-white for readability */
+  color: #ffffff;
 }
 
 .hero-heading .highlight {
-  color: #60a5fa; /* Lightened blue */
+  color: #60a5fa;
 }
 
 /* Subtitle */
 .hero-subtitle {
   font-family: "Inter", sans-serif;
-  font-size: 1.125rem;
-  color: #e5e7eb; /* Light gray */
-  line-height: 1.75rem;
+  font-size: 1.2rem;
+  color: #f3f4f6;
+  line-height: 1.6;
 }
 
 .hero-subtitle .hero-brand {
-  color: #93c5fd; /* Softer blue */
+  color: #93c5fd;
   font-weight: 500;
 }
 
-/* Dots */
-.carousel-dots {
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-  gap: 0.5rem;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #d1d5db;
-  cursor: pointer;
-}
-
-.dot.active {
-  background: #3b82f6;
-}
-
-/* Responsive scaling */
+/* Responsive text sizes */
 @media (min-width: 640px) {
   .hero-heading {
     font-size: 3.5rem;
-  }
-  .hero-subtitle {
-    font-size: 1.25rem;
   }
 }
 
 @media (min-width: 768px) {
   .hero-heading {
     font-size: 4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
   }
 }

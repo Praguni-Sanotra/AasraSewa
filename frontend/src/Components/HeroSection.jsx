@@ -23,14 +23,20 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section
-      className="hero-section"
-      style={{
-        backgroundImage: `url(${images[currentIndex]})`,
-      }}
-    >
+    <section className="hero-section">
+      {/* Background Image */}
+      <div className="hero-image-wrapper">
+        <img
+          src={images[currentIndex]}
+          alt="Background"
+          className="hero-bg-image"
+        />
+      </div>
+
+      {/* Dark overlay */}
       <div className="hero-overlay"></div>
 
+      {/* Content */}
       <motion.div
         className="hero-content"
         initial={{ opacity: 0, y: 30 }}
