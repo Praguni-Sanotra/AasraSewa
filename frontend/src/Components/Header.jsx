@@ -21,6 +21,14 @@ function LanguageButton() {
 }
 
 function DropdownButton({ open, setOpen }) {
+  const navigate = useNavigate(); //  Hook inside this component
+
+  const handleLogout = () => {
+    // Optional: Clear any session or auth tokens
+    // localStorage.removeItem("authToken");
+    navigate("/login"); // ✅ Redirect to login page
+  };
+
   return (
     <div className="dropdown-wrapper">
       <button className="icon-button" onClick={() => setOpen((prev) => !prev)}>
@@ -31,7 +39,9 @@ function DropdownButton({ open, setOpen }) {
           <ul className="dropdown-list">
             <li className="dropdown-item">Help Center</li>
             <li className="dropdown-item">Settings</li>
-            <li className="dropdown-item logout">Logout</li>
+            <li className="dropdown-item logout" onClick={handleLogout}>
+              Logout
+            </li>
           </ul>
         </div>
       )}

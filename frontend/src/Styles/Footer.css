@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: #212529;
-  background-color: #f8f9fa;
+  background-color: #e6f0f5; /* Relaxing pastel blue-gray */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,7 +19,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
+  background-color: #e6f0f5; /* Same as root for consistency */
   color: #212529;
 }
 
@@ -27,7 +27,9 @@ a {
   font-weight: 500;
   color: #0d6efd;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
+
 a:hover {
   color: #084298;
   text-decoration: underline;
@@ -40,27 +42,30 @@ h1 {
 }
 
 button {
-  border-radius: 0.5rem;
-  border: 1px solid #dee2e6;
+  display: inline-block;
   padding: 0.75em 1.5em;
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
-  background-color: #0d6efd;
   color: #fff;
+  background-color: #0d6efd;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
+
 button:hover {
   background-color: #084298;
   border-color: #084298;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Footer utility */
+/* === Footer Utility Styles === */
 .footer-columns {
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +73,7 @@ button:focus-visible {
   gap: 2rem;
   text-align: left;
   padding: 2rem 1rem;
-  background: #f1f3f5;
+  background-color: #dcebf1; /* Lighter shade of body for soft contrast */
   color: #495057;
 }
 
@@ -84,16 +89,16 @@ button:focus-visible {
 }
 
 .footer-column ul {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .footer-column ul li {
-  margin-bottom: 0.6rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  margin-bottom: 0.6rem;
   font-size: 0.95rem;
   color: #495057;
 }
@@ -104,19 +109,19 @@ button:focus-visible {
 }
 
 .footer-bottom {
-  background-color: #dee2e6;
-  padding: 1rem;
-  font-size: 0.9rem;
-  border-top: 1px solid #ced4da;
-  color: #212529;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
   width: 100%;
+  padding: 1rem;
+  font-size: 0.9rem;
+  background-color: #c9dbe3; /* Slightly deeper tone for distinction */
+  border-top: 1px solid #ced4da;
+  color: #212529;
+  text-align: center;
 }
 
-/* Responsive for smaller screens */
+/* === Responsive === */
 @media (max-width: 600px) {
   .footer-columns {
     flex-direction: column;
@@ -124,15 +129,17 @@ button:focus-visible {
   }
 }
 
-/* Light mode overrides (still here for safety) */
+/* === Light Mode Override (Safe fallback) === */
 @media (prefers-color-scheme: light) {
   :root {
     color: #212529;
-    background-color: #ffffff;
+    background-color: #e6f0f5;
   }
+
   a:hover {
     color: #0a58ca;
   }
+
   button {
     background-color: #0d6efd;
     color: #fff;
