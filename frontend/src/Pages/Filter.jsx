@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
-import "./../Styles/Results.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./../Styles/Filter.css";
 
 const dummyProperties = [
   {
+    id: 1,
     title: "Villa Serenity",
     capacity: 3,
     disasterFree: true,
@@ -12,6 +13,7 @@ const dummyProperties = [
     cost: 1500,
   },
   {
+    id: 2,
     title: "Haven Nest",
     capacity: 5,
     disasterFree: true,
@@ -20,6 +22,7 @@ const dummyProperties = [
     cost: 2200,
   },
   {
+    id: 3,
     title: "Sunshine Home",
     capacity: 2,
     disasterFree: false,
@@ -28,6 +31,7 @@ const dummyProperties = [
     cost: 0,
   },
   {
+    id: 4,
     title: "Harmony House",
     capacity: 6,
     disasterFree: true,
@@ -43,6 +47,7 @@ function useQuery() {
 
 const Results = () => {
   const query = useQuery();
+  const navigate = useNavigate();
   const defaultMembers = parseInt(query.get("members")) || 0;
 
   const [minMembers, setMinMembers] = useState(defaultMembers);
@@ -72,6 +77,10 @@ const Results = () => {
 
     setFilteredProperties(filtered);
     setShowFilters(false);
+  };
+
+  const handleCardClick = (id) => {
+    navigate(`/property/${id}`);
   };
 
   return (
@@ -110,7 +119,7 @@ const Results = () => {
                   checked={onlyDisasterFree}
                   onChange={(e) => setOnlyDisasterFree(e.target.checked)}
                 />
-                Show only Disaster-Free Houses
+                Show Safe Houses 
               </label>
 
               <label>
@@ -119,7 +128,7 @@ const Results = () => {
                   checked={onlyFree}
                   onChange={(e) => setOnlyFree(e.target.checked)}
                 />
-                Show only Free Houses
+                Show only Free of Cost Houses
               </label>
 
               <label>Sort by Cost:</label>
@@ -139,8 +148,13 @@ const Results = () => {
 
       <div className="results-grid">
         {filteredProperties.length > 0 ? (
-          filteredProperties.map((prop, idx) => (
-            <div key={idx} className="result-card">
+          filteredProperties.map((prop) => (
+            <div
+              key={prop.id}
+              className="result-card"
+              onClick={() => handleCardClick(prop.id)}
+              style={{ cursor: "pointer" }}
+            >
               <img src={prop.img} alt={prop.title} />
               <h3>{prop.title}</h3>
               <p>Location: {prop.location}</p>

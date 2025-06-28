@@ -13,10 +13,34 @@ function HostButton({ onClick }) {
 }
 
 function LanguageButton() {
+  const [open, setOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+
+  const handleSelect = (lang) => {
+    setSelectedLanguage(lang);
+    setOpen(false);
+    // Optionally save to localStorage
+    localStorage.setItem("preferredLanguage", lang);
+  };
+
   return (
-    <button className="icon-button">
-      <FaGlobe className="icon" />
-    </button>
+    <div className="dropdown-wrapper">
+      <button className="icon-button" onClick={() => setOpen((prev) => !prev)}>
+        <FaGlobe className="icon" />
+      </button>
+      {open && (
+        <div className="dropdown-menu">
+          <ul className="dropdown-list">
+            <li className="dropdown-item" onClick={() => handleSelect("English")}>
+              English
+            </li>
+            <li className="dropdown-item" onClick={() => handleSelect("Hindi")}>
+              Hindi
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 

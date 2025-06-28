@@ -18,7 +18,7 @@ export default function HeroSection() {
       setCurrentIndex((prevIndex) =>
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       );
-    }, 5000); // Change image every 5s
+    }, 1000); // Image changes every 1 second
     return () => clearInterval(interval);
   }, []);
 
@@ -36,7 +36,7 @@ export default function HeroSection() {
       {/* Dark overlay */}
       <div className="hero-overlay"></div>
 
-      {/* Content */}
+      {/* Text content in container */}
       <motion.div
         className="hero-content"
         initial={{ opacity: 0, y: 30 }}
@@ -44,10 +44,10 @@ export default function HeroSection() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <h1 className="hero-heading">
-          Find Your <span className="highlight">Aasra</span> with Sewa
+          Find Your <span className="highlight">Aasra</span> with Sewa!
         </h1>
         <p className="hero-subtitle">
-          Discover futuristic stays, unique experiences, and seamless bookings with{" "}
+          Smart Relief, Safe Shelter, Strong Communities!{" "}
           <span className="hero-brand">AasraSewa</span>.
         </p>
       </motion.div>
