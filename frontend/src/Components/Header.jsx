@@ -21,12 +21,10 @@ function LanguageButton() {
 }
 
 function DropdownButton({ open, setOpen }) {
-  const navigate = useNavigate(); //  Hook inside this component
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Optional: Clear any session or auth tokens
-    // localStorage.removeItem("authToken");
-    navigate("/login"); // ✅ Redirect to login page
+    navigate("/login");
   };
 
   return (
