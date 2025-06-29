@@ -12,30 +12,29 @@ import HeroSection from "./Components/HeroSection";
 import Footer from "./Components/Footer";
 
 import Signup from "./Pages/Signup";
-import LoginPage from "./Pages/LoginPage"; // ✅ Added LoginPage import
+import LoginPage from "./Pages/LoginPage";
 import Home from "./Pages/Home";
 import Host from "./Pages/Host";
-import Results from "./Pages/Filter";
+import Filter from "./Pages/Filter"; // ✅ Using your existing page
+import ResultsPage from "./Pages/Property"; // ✅ Separate results display
 import PropertyDetails from "./Pages/PropertyDetails";
 import Payment from "./Pages/Payment";
 import Accommodation from "./Pages/Accommodation";
+import Transport from "./Pages/Transport";
 
-// Layout component
 const Layout = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/signup" || location.pathname === "/login"; // ✅ Changed
+  const isAuthPage = location.pathname === "/signup" || location.pathname === "/login";
 
   return (
     <div className="app-wrapper">
-      {/* Conditionally render Header */}
       {!isAuthPage && <Header />}
 
-      {/* Main Content */}
       <main className="app-main container">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} /> {/* ✅ Default to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<LoginPage />} /> {/* ✅ Added login page */}
+          <Route path="/login" element={<LoginPage />} />
 
           <Route
             path="/home"
@@ -47,15 +46,15 @@ const Layout = () => {
             }
           />
           <Route path="/host" element={<Host />} />
-          <Route path="/results" element={<Results />} />
+          <Route path="/filter" element={<Filter />} /> {/* ✅ Filter Page */}
+          <Route path="/results" element={<ResultsPage />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/accommodation" element={<Accommodation />} />
+          <Route path="/transport" element={<Transport />} />
 
-          {/* Redirect from old route */}
           <Route path="/explore" element={<Navigate to="/home" replace />} />
 
-          {/* 404 Not Found */}
           <Route
             path="*"
             element={<h2 style={{ textAlign: "center" }}>404 - Page Not Found</h2>}
@@ -63,13 +62,11 @@ const Layout = () => {
         </Routes>
       </main>
 
-      {/* Conditionally render Footer */}
       {!isAuthPage && <Footer />}
     </div>
   );
 };
 
-// App wrapper
 const App = () => (
   <Router>
     <Layout />

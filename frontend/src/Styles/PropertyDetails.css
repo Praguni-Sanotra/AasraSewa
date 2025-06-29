@@ -17,18 +17,18 @@
   align-items: flex-start;
   gap: 2rem;
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
   margin-bottom: 2rem;
 }
 
 .property-img {
   width: 300px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
 }
 
 .property-info {
@@ -38,15 +38,18 @@
 
 .property-info h2 {
   margin-top: 0;
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: #1f2937;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .property-info p {
-  margin: 0.4rem 0;
+  margin: 0.6rem 0;
   font-size: 1.1rem;
-  color: #4b5563;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .action-buttons {
@@ -59,15 +62,16 @@
 
 .rent-btn,
 .transport-btn {
-  padding: 0.8rem 1.6rem;
+  padding: 0.9rem 1.8rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   width: 100%;
   max-width: 300px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .rent-btn {
@@ -104,6 +108,10 @@
 
   .property-info {
     text-align: center;
+  }
+
+  .property-info p {
+    justify-content: center;
   }
 
   .action-buttons {

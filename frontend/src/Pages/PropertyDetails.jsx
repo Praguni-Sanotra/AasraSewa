@@ -1,6 +1,15 @@
 // pages/PropertyDetails.jsx
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  MapPin,
+  Home,
+  Mail,
+  Users,
+  IndianRupee,
+  Info,
+  Ruler,
+} from "lucide-react";
 import "./../Styles/PropertyDetails.css";
 
 const dummyProperties = [
@@ -65,7 +74,7 @@ const PropertyDetails = () => {
 
   const handleRentClick = () => {
     if (property.cost === 0) {
-      alert("✅ Proceeding to accommodate in the shelter...");
+      alert("Proceeding to accommodate in the shelter...");
       setTimeout(() => {
         navigate("/accommodation", { state: { property } });
       }, 1000);
@@ -85,13 +94,13 @@ const PropertyDetails = () => {
         <img src={property.img} alt={property.title} className="property-img" />
         <div className="property-info">
           <h2>{property.title}</h2>
-          <p><strong>📍 Location:</strong> {property.location}</p>
-          <p><strong>🏘️ Area:</strong> {property.area}</p>
-          <p><strong>📮 Pincode:</strong> {property.pincode}</p>
-          <p><strong>👥 Capacity:</strong> {property.capacity} people</p>
-          <p><strong>💰 Cost:</strong> ₹{property.cost === 0 ? "Free" : property.cost}</p>
-          <p><strong>ℹ️ Description:</strong> {property.description}</p>
-          <p><strong>📏 Distance from you:</strong> {property.distance}</p>
+          <p><MapPin size={16} style={{ marginRight: "6px" }} /> <strong>Location:</strong> {property.location}</p>
+          <p><Home size={16} style={{ marginRight: "6px" }} /> <strong>Area:</strong> {property.area}</p>
+          <p><Mail size={16} style={{ marginRight: "6px" }} /> <strong>Pincode:</strong> {property.pincode}</p>
+          <p><Users size={16} style={{ marginRight: "6px" }} /> <strong>Capacity:</strong> {property.capacity} people</p>
+          <p><IndianRupee size={16} style={{ marginRight: "6px" }} /> <strong>Cost:</strong> ₹{property.cost === 0 ? "Free" : property.cost}</p>
+          <p><Info size={16} style={{ marginRight: "6px" }} /> <strong>Description:</strong> {property.description}</p>
+          <p><Ruler size={16} style={{ marginRight: "6px" }} /> <strong>Distance:</strong> {property.distance}</p>
         </div>
       </div>
 
@@ -100,7 +109,7 @@ const PropertyDetails = () => {
           Rent
         </button>
         <button className="transport-btn" onClick={handleTransportClick}>
-          Transport Facility
+          Book Transport
         </button>
       </div>
     </div>
