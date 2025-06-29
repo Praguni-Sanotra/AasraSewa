@@ -1,8 +1,7 @@
-// src/Pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import "../Styles/login.css"; // Correct CSS import
+import "../Styles/Signup.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,11 +14,23 @@ const Login = () => {
     gender: "",
     bloodGroup: "",
     address: "",
-    aadhaar: "",
+    aadhaarImage: null,
+    familyCount: "",
+    aadhaarPreview: null,
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === "aadhaarImage") {
+      const file = files[0];
+      setFormData((prev) => ({
+        ...prev,
+        aadhaarImage: file,
+        aadhaarPreview: file ? URL.createObjectURL(file) : null,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -32,9 +43,9 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="image-container">
-        <img src={logo} alt="Logo" className="login-logo" />
+          <img src={logo} alt="Logo" className="login-logo" />
         </div>
-        <h2>AasraSewa - User Login</h2>
+        <h2>AasraSewa - User SignUp</h2>
         <p>Enter your details to access emergency services</p>
 
         <form onSubmit={handleSubmit}>
@@ -46,7 +57,7 @@ const Login = () => {
             "age",
             "bloodGroup",
             "address",
-            "aadhaar",
+            "familyCount",
           ].map((field) => (
             <input
               key={field}
@@ -55,14 +66,16 @@ const Login = () => {
                   ? "email"
                   : field === "password"
                   ? "password"
-                  : field === "age"
+                  : field === "age" || field === "familyCount"
                   ? "number"
                   : "text"
               }
               name={field}
               placeholder={
-                field.charAt(0).toUpperCase() +
-                field.slice(1).replace(/([A-Z])/g, " $1")
+                field === "familyCount"
+                  ? "Total Family Members"
+                  : field.charAt(0).toUpperCase() +
+                    field.slice(1).replace(/([A-Z])/g, " $1")
               }
               value={formData[field]}
               onChange={handleChange}
@@ -82,8 +95,31 @@ const Login = () => {
             <option value="Other">Other</option>
           </select>
 
+          {/* Aadhaar Upload Section */}
+          <div className="aadhaar-section">
+            <label className="login-label">Upload Aadhaar Photo:</label>
+            <div className="aadhaar-upload-area">
+              <span className="aadhaar-instruction">Click or tap to upload</span>
+              <input
+                type="file"
+                name="aadhaarImage"
+                accept="image/*"
+                onChange={handleChange}
+                className="aadhaar-file-input"
+              />
+            </div>
+
+            {formData.aadhaarPreview && (
+              <img
+                src={formData.aadhaarPreview}
+                alt="Aadhaar Preview"
+                className="aadhaar-preview-image"
+              />
+            )}
+          </div>
+
           <button type="submit" className="login-button">
-            Login & Proceed
+            SignUp
           </button>
         </form>
       </div>

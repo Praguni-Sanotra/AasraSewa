@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../Styles/Host.css"; // Assuming you have a CSS file for styling
 
 export default function HostPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     location: "",
+    area: "",
+    pincode: "",
+    address: "",
     description: "",
     price: "",
   });
@@ -53,6 +59,9 @@ export default function HostPage() {
     }
 
     console.log("Form Submitted", formData, wallImages);
+
+    // Navigate to property details and pass data
+    navigate("/property/1", { state: { ...formData, wallImages } });
   };
 
   return (
@@ -95,6 +104,30 @@ export default function HostPage() {
             name="location"
             placeholder="Property Location"
             value={formData.location}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="area"
+            placeholder="Area / Landmark"
+            value={formData.area}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="pincode"
+            placeholder="Pincode"
+            value={formData.pincode}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="address"
+            placeholder="Full Address"
+            value={formData.address}
             onChange={handleChange}
             required
           />
