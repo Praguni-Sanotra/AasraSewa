@@ -1,9 +1,12 @@
+// pages/Home.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./../Styles/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const mapLocation = location.state?.mapLocation;
 
   const handleExplore = () => {
     navigate("/results");
@@ -34,6 +37,12 @@ const Home = () => {
     },
   ];
 
+  const generateGoogleMapURL = () => {
+    if (!mapLocation) return "https://www.google.com/maps/embed?pb=!1m18...";
+    const query = `${mapLocation.area}, ${mapLocation.city}, ${mapLocation.pincode}`;
+    return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  };
+
   return (
     <div className="home-page">
       <section className="home-section">
@@ -42,7 +51,7 @@ const Home = () => {
             <div className="home-map">
               <iframe
                 title="Aasra Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019504628447!2d-122.41941518468156!3d37.77492977975998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808f7e2d6b1d4345%3A0xcee47c4f84e5b11e!2sShelter!5e0!3m2!1sen!2sin!4v1634200342789!5m2!1sen!2sin"
+                src={generateGoogleMapURL()}
                 className="home-iframe"
                 allowFullScreen
                 loading="lazy"

@@ -14,7 +14,16 @@ const Payment = () => {
 
   const handlePayment = () => {
     alert(`Payment successful for ₹${property.cost}`);
-    navigate("/home");
+    // Pass the location data to the homepage via navigation state
+    navigate("/home", {
+      state: {
+        mapLocation: {
+          area: property.area || "Unknown Area",
+          city: property.location || "Unknown City",
+          pincode: property.pincode || "000000"
+        }
+      }
+    });
   };
 
   return (
@@ -31,4 +40,4 @@ const Payment = () => {
   );
 };
 
-export default Payment; // Matches file name and import
+export default Payment;
