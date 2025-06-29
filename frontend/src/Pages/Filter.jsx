@@ -160,7 +160,7 @@ const Results = () => {
               <p>Location: {prop.location}</p>
               <p>Capacity: {prop.capacity} people</p>
               <p>Cost: ₹{prop.cost}</p>
-              <p>{prop.disasterFree ? "Disaster-Free ✅" : "⚠ Not Disaster-Free"}</p>
+            
             </div>
           ))
         ) : (
