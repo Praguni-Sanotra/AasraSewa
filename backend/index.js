@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import connectDB from "./config/connectDb.js";
 import userRoute from "./routes/user.route.js";
+import propertRoute from "./routes/propety.routes.js";
 // Load environment variables from .env file
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use(cors(corsOptions));
 
 // api's
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/property", propertRoute);
 
 // Connect to MongoDB, then start the Express server
 connectDB()

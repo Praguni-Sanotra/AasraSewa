@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 const propertySchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
-    location: { type: String, required: true, trim: true },
+    landmark: { type: String, required: true, trim: true },
+    pincode: { type: String, required: true, trim: true },
+    fullAddress: { type: String, required: true, trim: true },
     pricePerNight: { type: Number, required: true, min: 0 },
     description: { type: String, required: true, maxlength: 500, trim: true },
     capacity: { type: Number, required: true, min: 1 },
