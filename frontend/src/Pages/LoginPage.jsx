@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.jsx";
 import "../Styles/LoginPage.css";
 import logo from "../assets/logo.png"; // ✅ Import logo
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -19,18 +23,41 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    
     if (!formData.email || !formData.password) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
-    console.log("Login data submitted:", formData);
-    // Store credentials in localStorage if rememberMe is checked (optional logic)
-    if (formData.rememberMe) {
-      localStorage.setItem("rememberedEmail", formData.email);
+
+    setLoading(true);
+    
+    try {
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (result.success) {
+        // Store credentials in localStorage if rememberMe is checked
+        if (formData.rememberMe) {
+          localStorage.setItem("rememberedEmail", formData.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+        
+        navigate("/home");
+      } else {
+        setError(result.error || "Login failed");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
-    navigate("/home");
   };
 
   return (
@@ -44,6 +71,8 @@ const LoginPage = () => {
         <h2>Welcome Back!</h2>
         <p>Please login to continue</p>
 
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <input
             type="email"
@@ -53,6 +82,7 @@ const LoginPage = () => {
             onChange={handleChange}
             className="login-input"
             required
+            disabled={loading}
           />
           <input
             type="password"
@@ -62,6 +92,7 @@ const LoginPage = () => {
             onChange={handleChange}
             className="login-input"
             required
+            disabled={loading}
           />
 
           {/* ✅ Remember me */}
@@ -72,17 +103,22 @@ const LoginPage = () => {
               checked={formData.rememberMe}
               onChange={handleChange}
               className="remember-checkbox"
+              disabled={loading}
             />
             Remember Me
           </label>
 
-          <button type="submit" className="login-button">
-            Login
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <p className="signup-text">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <span className="signup-link" onClick={() => navigate("/signup")}>
             SignUp
           </span>

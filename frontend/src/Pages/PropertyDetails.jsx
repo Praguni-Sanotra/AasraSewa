@@ -1,70 +1,71 @@
 // pages/PropertyDetails.jsx
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import apiService from "../services/api.js";
 import "./../Styles/PropertyDetails.css";
-
-const dummyProperties = [
-  {
-    id: 1,
-    title: "Villa Serenity",
-    capacity: 3,
-    location: "Delhi",
-    area: "Green Park",
-    pincode: "110016",
-    img: "https://placehold.co/250x150?text=Villa+1",
-    cost: 1500,
-    description: "A peaceful and secure villa in Green Park.",
-    distance: "5km"
-  },
-  {
-    id: 2,
-    title: "Haven Nest",
-    capacity: 5,
-    location: "Mumbai",
-    area: "Bandra",
-    pincode: "400050",
-    img: "https://placehold.co/250x150?text=Villa+2",
-    cost: 2200,
-    description: "Spacious haven near the coast.",
-    distance: "8km"
-  },
-  {
-    id: 3,
-    title: "Sunshine Home",
-    capacity: 2,
-    location: "Pune",
-    area: "Kothrud",
-    pincode: "411038",
-    img: "https://placehold.co/250x150?text=Villa+3",
-    cost: 0,
-    description: "Budget-friendly small house.",
-    distance: "3km"
-  },
-  {
-    id: 4,
-    title: "Harmony House",
-    capacity: 6,
-    location: "Chennai",
-    area: "Adyar",
-    pincode: "600020",
-    img: "https://placehold.co/250x150?text=Villa+4",
-    cost: 3000,
-    description: "Large disaster-proof home in a calm neighborhood.",
-    distance: "10km"
-  },
-];
 
 const PropertyDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const property = dummyProperties.find((prop) => prop.id === parseInt(id));
+  const location = useLocation();
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (!property) {
-    return <h2 style={{ textAlign: "center" }}>Property not found</h2>;
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        setLoading(true);
+        const result = await apiService.getPropertyById(id);
+        
+        if (result.success) {
+          setProperty(result.data.property);
+        } else {
+          setError(result.error || "Property not found");
+        }
+      } catch (error) {
+        setError("Failed to load property details");
+        console.error("Property fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProperty();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="property-details">
+        <div className="spacer"></div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !property) {
+    return (
+      <div className="property-details">
+        <div className="spacer"></div>
+        <div className="error-container">
+          <h2>Property not found</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate("/home")} className="back-btn">
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const handleRentClick = () => {
-    if (property.cost === 0) {
+    if (property.pricePerNight === 0) {
       alert("✅ Proceeding to accommodate in the shelter...");
       setTimeout(() => {
         navigate("/accommodation", { state: { property } });
@@ -78,20 +79,109 @@ const PropertyDetails = () => {
     navigate("/transport");
   };
 
+  // Get all images for pagination
+  const allImages = [
+    property.propertyImage,
+    property.images?.frontWall,
+    property.images?.backWall,
+    property.images?.leftWall,
+    property.images?.rightWall,
+  ].filter(Boolean);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === allImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? allImages.length - 1 : prev - 1
+    );
+  };
+
+  const goToImage = (index) => {
+    setCurrentImageIndex(index);
+  };
+
   return (
     <div className="property-details">
       <div className="spacer"></div>
       <div className="property-card">
-        <img src={property.img} alt={property.title} className="property-img" />
+        {/* Image Gallery with Pagination */}
+        <div className="property-image-gallery">
+          <div className="main-image-container">
+            <img 
+              src={allImages[currentImageIndex]} 
+              alt={`${property.title} - Image ${currentImageIndex + 1}`} 
+              className="property-img" 
+            />
+            
+            {/* Navigation arrows */}
+            {allImages.length > 1 && (
+              <>
+                <button 
+                  className="nav-arrow prev-arrow" 
+                  onClick={prevImage}
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+                <button 
+                  className="nav-arrow next-arrow" 
+                  onClick={nextImage}
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Thumbnail pagination */}
+          {allImages.length > 1 && (
+            <div className="image-thumbnails">
+              {allImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                  onClick={() => goToImage(index)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Image counter */}
+          {allImages.length > 1 && (
+            <div className="image-counter">
+              {currentImageIndex + 1} / {allImages.length}
+            </div>
+          )}
+        </div>
+
         <div className="property-info">
           <h2>{property.title}</h2>
-          <p><strong>📍 Location:</strong> {property.location}</p>
-          <p><strong>🏘️ Area:</strong> {property.area}</p>
+          <p><strong>📍 Location:</strong> {property.landmark}</p>
+          <p><strong>🏘️ Address:</strong> {property.fullAddress}</p>
           <p><strong>📮 Pincode:</strong> {property.pincode}</p>
           <p><strong>👥 Capacity:</strong> {property.capacity} people</p>
-          <p><strong>💰 Cost:</strong> ₹{property.cost === 0 ? "Free" : property.cost}</p>
+          <p><strong>💰 Price per Night:</strong> ₹{property.pricePerNight === 0 ? "Free" : property.pricePerNight}</p>
           <p><strong>ℹ️ Description:</strong> {property.description}</p>
-          <p><strong>📏 Distance from you:</strong> {property.distance}</p>
+          <p><strong>📧 Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
+          <p><strong>📱 Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
+          <p><strong>📊 Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
+          <p><strong>⭐ Rating:</strong> {property.star}/5</p>
+          
+          {property.createdBy && (
+            <div className="host-info">
+              <h3>Host Information</h3>
+              <p><strong>Name:</strong> {property.createdBy.fullName}</p>
+              <p><strong>Email:</strong> {property.createdBy.email}</p>
+              <p><strong>Phone:</strong> {property.createdBy.phone}</p>
+            </div>
+          )}
         </div>
       </div>
 

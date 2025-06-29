@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaGlobe, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.jsx";
 import logo from "../assets/logo.png";
 import "./../Styles/Header.css";
 
@@ -46,9 +47,17 @@ function LanguageButton() {
 
 function DropdownButton({ open, setOpen }) {
   const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if logout fails, redirect to login
+      navigate("/login");
+    }
   };
 
   return (
@@ -59,6 +68,11 @@ function DropdownButton({ open, setOpen }) {
       {open && (
         <div className="dropdown-menu">
           <ul className="dropdown-list">
+            {user && (
+              <li className="dropdown-item user-info">
+                Welcome, {user.fullName}
+              </li>
+            )}
             <li className="dropdown-item">Help Center</li>
             <li className="dropdown-item">Settings</li>
             <li className="dropdown-item logout" onClick={handleLogout}>

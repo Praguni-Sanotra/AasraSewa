@@ -85,3 +85,27 @@ form {
 .signup-link:hover {
   color: #2563eb;
 }
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #fcc;
+  text-align: center;
+}
+
+.login-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.login-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.remember-checkbox:disabled {
+  cursor: not-allowed;
+}

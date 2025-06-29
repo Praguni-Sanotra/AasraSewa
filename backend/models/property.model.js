@@ -24,7 +24,6 @@ const propertySchema = new mongoose.Schema(
       leftWall: { type: String, required: true, trim: true },
       rightWall: { type: String, required: true, trim: true },
     },
-    disasterFree: { type: Boolean, default: true },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -36,7 +35,6 @@ const propertySchema = new mongoose.Schema(
       max: 5,
       default: 0,
     },
-
     isBooked: { type: Boolean, default: false },
   },
   {

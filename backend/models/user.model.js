@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
       enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
     },
     address: { type: String, required: true },
-    aadhaar: { type: String, unique: true, required: true },
+    aadhaarImage: { type: String, required: true },
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],

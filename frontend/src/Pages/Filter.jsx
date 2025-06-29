@@ -1,45 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import apiService from "../services/api.js";
 import "./../Styles/Filter.css";
-
-const dummyProperties = [
-  {
-    id: 1,
-    title: "Villa Serenity",
-    capacity: 3,
-    disasterFree: true,
-    location: "Delhi",
-    img: "https://placehold.co/250x150?text=Villa+1",
-    cost: 1500,
-  },
-  {
-    id: 2,
-    title: "Haven Nest",
-    capacity: 5,
-    disasterFree: true,
-    location: "Mumbai",
-    img: "https://placehold.co/250x150?text=Villa+2",
-    cost: 2200,
-  },
-  {
-    id: 3,
-    title: "Sunshine Home",
-    capacity: 2,
-    disasterFree: false,
-    location: "Pune",
-    img: "https://placehold.co/250x150?text=Villa+3",
-    cost: 0,
-  },
-  {
-    id: 4,
-    title: "Harmony House",
-    capacity: 6,
-    disasterFree: true,
-    location: "Chennai",
-    img: "https://placehold.co/250x150?text=Villa+4",
-    cost: 3000,
-  },
-];
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -50,42 +12,138 @@ const Results = () => {
   const navigate = useNavigate();
   const defaultMembers = parseInt(query.get("members")) || 0;
 
+  const [filters, setFilters] = useState({
+    minCost: "",
+    maxCost: "",
+    members: "",
+  });
+  const [sortBy, setSortBy] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalProperties, setTotalProperties] = useState(0);
+
+  // Filter states
   const [minMembers, setMinMembers] = useState(defaultMembers);
-  const [onlyDisasterFree, setOnlyDisasterFree] = useState(false);
-  const [maxCost, setMaxCost] = useState(5000);
   const [onlyFree, setOnlyFree] = useState(false);
-  const [sortByCost, setSortByCost] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [filteredProperties, setFilteredProperties] = useState(dummyProperties);
+  
+  // Pagination states
+  const [limit] = useState(10);
 
-  const handleApplyFilters = () => {
-    let filtered = dummyProperties.filter((house) => {
-      const isFreeMatch = !onlyFree || house.cost === 0;
-      return (
-        house.capacity >= minMembers &&
-        house.cost <= maxCost &&
-        (!onlyDisasterFree || house.disasterFree) &&
-        isFreeMatch
+  // Fetch properties from API
+  const fetchProperties = async (page = 1) => {
+    try {
+      setLoading(true);
+      
+      // Build query parameters
+      const params = {
+        page,
+        limit,
+        members: minMembers > 0 ? minMembers : undefined,
+        maxCost: filters.maxCost ? parseInt(filters.maxCost) : undefined,
+        minCost: filters.minCost ? parseInt(filters.minCost) : undefined,
+        sort: sortBy || undefined,
+      };
+
+      // Remove undefined values
+      Object.keys(params).forEach(key => 
+        params[key] === undefined && delete params[key]
       );
-    });
 
-    if (sortByCost === "low") {
-      filtered.sort((a, b) => a.cost - b.cost);
-    } else if (sortByCost === "high") {
-      filtered.sort((a, b) => b.cost - a.cost);
+      const result = await apiService.getAllProperties(params);
+      
+      if (result.success) {
+        setProperties(result.data.properties);
+        setTotalPages(result.data.totalPages);
+        setTotalProperties(result.data.total);
+        setCurrentPage(page);
+      } else {
+        setError(result.error || "Failed to fetch properties");
+      }
+    } catch (error) {
+      setError("An error occurred while fetching properties");
+      console.error("Properties fetch error:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setFilteredProperties(filtered);
+  // Initial fetch
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  // Apply filters
+  const handleApplyFilters = () => {
+    setCurrentPage(1);
+    fetchProperties(1);
     setShowFilters(false);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page) => {
+    fetchProperties(page);
   };
 
   const handleCardClick = (id) => {
     navigate(`/property/${id}`);
   };
 
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
+  if (loading && properties.length === 0) {
+    return (
+      <div className="results">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading properties...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="results">
       <h2>Filter and View Properties</h2>
+      
+      {error && <div className="error-message">{error}</div>}
 
       <div className="filter-container">
         <div className="filter-toggle">
@@ -103,24 +161,25 @@ const Results = () => {
                 onChange={(e) => setMinMembers(parseInt(e.target.value))}
               />
 
-              <label>Max Cost: ₹{maxCost}</label>
+              <label>Max Cost: ₹{filters.maxCost}</label>
               <input
                 type="range"
                 min="0"
                 max="5000"
                 step="100"
-                value={maxCost}
-                onChange={(e) => setMaxCost(parseInt(e.target.value))}
+                value={filters.maxCost}
+                onChange={(e) => setFilters({ ...filters, maxCost: e.target.value })}
               />
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={onlyDisasterFree}
-                  onChange={(e) => setOnlyDisasterFree(e.target.checked)}
-                />
-                Show Safe Houses 
-              </label>
+              <label>Min Cost: ₹{filters.minCost}</label>
+              <input
+                type="range"
+                min="0"
+                max="5000"
+                step="100"
+                value={filters.minCost}
+                onChange={(e) => setFilters({ ...filters, minCost: e.target.value })}
+              />
 
               <label>
                 <input
@@ -132,10 +191,9 @@ const Results = () => {
               </label>
 
               <label>Sort by Cost:</label>
-              <select value={sortByCost} onChange={(e) => setSortByCost(e.target.value)}>
-                <option value="">None</option>
-                <option value="low">Low to High</option>
-                <option value="high">High to Low</option>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="asc">Low to High</option>
+                <option value="desc">High to Low</option>
               </select>
 
               <button className="apply-btn" onClick={handleApplyFilters}>
@@ -146,27 +204,70 @@ const Results = () => {
         </div>
       </div>
 
+      {/* Results Summary */}
+      <div className="results-summary">
+        <p>Showing {properties.length} of {totalProperties} properties</p>
+      </div>
+
       <div className="results-grid">
-        {filteredProperties.length > 0 ? (
-          filteredProperties.map((prop) => (
+        {properties.length > 0 ? (
+          properties.map((prop) => (
             <div
-              key={prop.id}
+              key={prop._id}
               className="result-card"
-              onClick={() => handleCardClick(prop.id)}
+              onClick={() => handleCardClick(prop._id)}
               style={{ cursor: "pointer" }}
             >
-              <img src={prop.img} alt={prop.title} />
+              <img 
+                src={prop.propertyImage || "https://placehold.co/250x150?text=Property"} 
+                alt={prop.title} 
+              />
               <h3>{prop.title}</h3>
-              <p>Location: {prop.location}</p>
-              <p>Capacity: {prop.capacity} people</p>
-              <p>Cost: ₹{prop.cost}</p>
-            
+              <p><strong>📍 Landmark:</strong> {prop.landmark}</p>
+              <p><strong>👥 Capacity:</strong> {prop.capacity} people</p>
+              <p><strong>💰 Cost:</strong> ₹{prop.pricePerNight === 0 ? "Free" : prop.pricePerNight}</p>
+              <p><strong>📊 Status:</strong> <span className={`status-${prop.status}`}>{prop.status}</span></p>
             </div>
           ))
         ) : (
-          <p>No suitable properties found.</p>
+          <div className="no-results">
+            <p>No suitable properties found.</p>
+            <p>Try adjusting your filters or check back later.</p>
+          </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            Previous
+          </button>
+          
+          {getPageNumbers().map((page, index) => (
+            <button
+              key={index}
+              onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
+              disabled={page === '...'}
+              className={`pagination-btn ${page === currentPage ? 'active' : ''} ${page === '...' ? 'disabled' : ''}`}
+            >
+              {page}
+            </button>
+          ))}
+          
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

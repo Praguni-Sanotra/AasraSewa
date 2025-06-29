@@ -142,6 +142,15 @@
 .logout {
   color: #ef4444;
 }
+
+.dropdown-item.user-info {
+  font-weight: bold;
+  color: #2563eb;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
 @media (max-width: 768px) {
   .header-container {
     padding: 0.5rem 1rem;

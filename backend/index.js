@@ -1,64 +1,60 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import connectDB from "./config/connectDb.js";
 import userRoute from "./routes/user.route.js";
-import propertRoute from "./routes/propety.routes.js";
+import propertRoute from "./routes/property.route.js";
+import { setupSecurity, authLimiter } from "./middlewares/security.js";
+import { setupCORS } from "./middlewares/cors.js";
+import { setupErrorHandlers } from "./middlewares/errorHandlers.js";
+
+console.log("[DEBUG] Starting server setup");
+
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+console.log("[DEBUG] Express app created");
 
 // Get port from environment variables or fallback to 3000
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse incoming JSON requests
-app.use(express.json());
+// Setup security middleware
+setupSecurity(app);
 
-// Middleware to parse URL-encoded data (e.g., form submissions)
-app.use(express.urlencoded({ extended: true }));
+// Setup CORS
+setupCORS(app);
 
-// Middleware to parse cookies from incoming requests
+// Basic middleware
+console.log("[DEBUG] Adding basic middleware");
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Define allowed origins for CORS (e.g., your frontend app URLs)
-const allowedOrigins = [
-  "http://localhost:5173", // Vite frontend development server
-];
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+console.log("[DEBUG] Health check endpoint added");
 
-// CORS configuration to allow cross-origin requests only from allowedOrigins
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman or server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // Reject requests from disallowed origins
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // Enable cookies and credentials to be sent
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers in requests
-};
-
-// Apply CORS middleware with the specified options
-app.use(cors(corsOptions));
-
-// api's
-app.use("/api/v1/user", userRoute);
+// API routes
+console.log("[DEBUG] Registering routes");
+app.use("/api/v1/user", authLimiter, userRoute);
 app.use("/api/v1/property", propertRoute);
+console.log("[DEBUG] Routes registered");
 
-// Connect to MongoDB, then start the Express server
+// Setup error handlers
+setupErrorHandlers(app);
+
+// Connect to MongoDB and start server
+console.log("[DEBUG] Connecting to MongoDB");
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
     });
   })
   .catch((err) => {
-    // Log database connection errors and exit process
     console.error("Failed to connect to DB", err);
     process.exit(1);
   });

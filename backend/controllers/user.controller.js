@@ -20,7 +20,7 @@ export const register = async (req, res) => {
       age,
       bloodGroup,
       address,
-      aadhaar,
+      aadhaarImage,
       gender,
     } = req.body;
 
@@ -33,7 +33,7 @@ export const register = async (req, res) => {
       !age ||
       !bloodGroup ||
       !address ||
-      !aadhaar ||
+      !aadhaarImage ||
       !gender
     ) {
       return res
@@ -95,7 +95,7 @@ export const register = async (req, res) => {
       age,
       bloodGroup,
       address,
-      aadhaar,
+      aadhaarImage,
       gender,
     });
 
@@ -170,8 +170,13 @@ export const login = async (req, res) => {
         user: {
           id: user._id,
           email: user.email,
+          fullName: user.fullName,
+          phone: user.phone,
+          age: user.age,
+          bloodGroup: user.bloodGroup,
+          gender: user.gender,
+          address: user.address,
         },
-        token,
       });
   } catch (error) {
     console.error("Error in login:", error);
@@ -261,6 +266,34 @@ export const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in updateUser:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+// Get user profile
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.id; // `req.id` is set from isAuthenticated middleware
+    
+    const user = await User.findById(userId).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile retrieved successfully",
+      user,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in getProfile:", error);
     return res.status(500).json({
       message: "Internal server error",
       success: false,

@@ -12,7 +12,6 @@ export const registerProperty = async (req, res) => {
       description,
       capacity,
       images,
-      disasterFree,
       propertyImage,
     } = req.body;
 
@@ -47,7 +46,6 @@ export const registerProperty = async (req, res) => {
       capacity: Number(capacity),
       createdBy,
       images,
-      disasterFree,
       propertyImage, // optional
     });
 
@@ -177,7 +175,6 @@ export const updateMyProperty = async (req, res) => {
       "description",
       "capacity",
       "images",
-      "disasterFree",
       "propertyImage",
     ];
 
@@ -201,5 +198,34 @@ export const updateMyProperty = async (req, res) => {
   } catch (error) {
     console.error("Error updating property:", error);
     res.status(500).json({ message: "Server error while updating property." });
+  }
+};
+
+// Get property by ID
+export const getPropertyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid property ID." });
+    }
+
+    // Find property and populate creator info
+    const property = await Property.findById(id)
+      .populate('createdBy', 'fullName email phone')
+      .select('-__v');
+
+    if (!property) {
+      return res.status(404).json({ message: "Property not found." });
+    }
+
+    res.status(200).json({
+      message: "Property retrieved successfully.",
+      property,
+    });
+  } catch (error) {
+    console.error("Error getting property:", error);
+    res.status(500).json({ message: "Server error while getting property." });
   }
 };

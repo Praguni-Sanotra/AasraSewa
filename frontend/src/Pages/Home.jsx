@@ -1,6 +1,7 @@
 // pages/Home.jsx
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import AuthTest from "../Components/AuthTest.jsx";
 import "./../Styles/Home.css";
 
 const Home = () => {
@@ -45,6 +46,9 @@ const Home = () => {
 
   return (
     <div className="home-page">
+      {/* Auth Test Component - Remove this in production */}
+      <AuthTest />
+      
       <section className="home-section">
         <div className="home-container">
           <div className="home-map-wrapper">

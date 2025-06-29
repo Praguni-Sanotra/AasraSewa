@@ -1,46 +1,77 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.jsx";
+import cloudinaryService from "../services/cloudinary.js";
+import apiService from "../services/api.js";
 import "../Styles/Host.css"; // Assuming you have a CSS file for styling
 
 export default function HostPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    location: "",
-    area: "",
+    title: "",
+    landmark: "",
     pincode: "",
-    address: "",
+    fullAddress: "",
+    pricePerNight: "",
     description: "",
-    price: "",
+    capacity: "",
   });
+
+  const [propertyImage, setPropertyImage] = useState(null);
+  const [propertyImagePreview, setPropertyImagePreview] = useState(null);
 
   const [wallImages, setWallImages] = useState({
-    front: null,
-    back: null,
-    left: null,
-    right: null,
+    frontWall: null,
+    backWall: null,
+    leftWall: null,
+    rightWall: null,
   });
 
+  const [wallImagePreviews, setWallImagePreviews] = useState({
+    frontWall: null,
+    backWall: null,
+    leftWall: null,
+    rightWall: null,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: type === 'checkbox' ? checked : value 
+    });
+  };
+
+  const handlePropertyImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPropertyImage(file);
+      setPropertyImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleWallImageUpload = (e, wall) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) {
+      setWallImages((prev) => ({
+        ...prev,
+        [wall]: file,
+      }));
+      setWallImagePreviews((prev) => ({
+        ...prev,
+        [wall]: URL.createObjectURL(file),
+      }));
+    }
+  };
 
-    const imageData = {
-      file,
-      url: URL.createObjectURL(file),
-    };
-
-    setWallImages((prev) => ({
-      ...prev,
-      [wall]: imageData,
-    }));
+  const removePropertyImage = () => {
+    setPropertyImage(null);
+    setPropertyImagePreview(null);
   };
 
   const removeWallImage = (wall) => {
@@ -48,20 +79,101 @@ export default function HostPage() {
       ...prev,
       [wall]: null,
     }));
+    setWallImagePreviews((prev) => ({
+      ...prev,
+      [wall]: null,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (!wallImages.front || !wallImages.back || !wallImages.left || !wallImages.right) {
-      alert("Please upload images for all 4 walls.");
+    // Validate required fields
+    const requiredFields = [
+      "title", "landmark", "pincode", "fullAddress", 
+      "pricePerNight", "description", "capacity"
+    ];
+    
+    const missingFields = requiredFields.filter(field => !formData[field]);
+    if (missingFields.length > 0) {
+      setError(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
     }
 
-    console.log("Form Submitted", formData, wallImages);
+    // Check if all wall images are uploaded
+    const requiredWalls = ['frontWall', 'backWall', 'leftWall', 'rightWall'];
+    const missingWalls = requiredWalls.filter(wall => !wallImages[wall]);
+    if (missingWalls.length > 0) {
+      setError(`Please upload images for all walls: ${missingWalls.join(", ")}`);
+      return;
+    }
 
-    // Navigate to property details and pass data
-    navigate("/property/1", { state: { ...formData, wallImages } });
+    setLoading(true);
+
+    try {
+      // Upload property image if provided
+      let propertyImageUrl = null;
+      if (propertyImage) {
+        const propertyUploadResult = await cloudinaryService.uploadImage(propertyImage, 'properties');
+        if (!propertyUploadResult.success) {
+          setError("Failed to upload property image. Please try again.");
+          return;
+        }
+        propertyImageUrl = propertyUploadResult.url;
+      }
+
+      // Upload all wall images
+      const wallUploadPromises = Object.entries(wallImages).map(async ([wall, file]) => {
+        const result = await cloudinaryService.uploadImage(file, 'walls');
+        return { wall, result };
+      });
+
+      const wallUploadResults = await Promise.all(wallUploadPromises);
+      
+      // Check if all wall uploads were successful
+      const failedUploads = wallUploadResults.filter(({ result }) => !result.success);
+      if (failedUploads.length > 0) {
+        setError("Failed to upload some wall images. Please try again.");
+        return;
+      }
+
+      // Prepare images object
+      const images = {};
+      wallUploadResults.forEach(({ wall, result }) => {
+        images[wall] = result.url;
+      });
+
+      // Prepare property data
+      const propertyData = {
+        title: formData.title,
+        landmark: formData.landmark,
+        pincode: formData.pincode,
+        fullAddress: formData.fullAddress,
+        pricePerNight: parseFloat(formData.pricePerNight),
+        description: formData.description,
+        capacity: parseInt(formData.capacity),
+        images,
+        propertyImage: propertyImageUrl,
+      };
+
+      // Register property with backend
+      const result = await apiService.registerProperty(propertyData);
+
+      if (result.success) {
+        // Property registered successfully
+        navigate("/home", { 
+          state: { message: "Property registered successfully! It will be reviewed by admin." }
+        });
+      } else {
+        setError(result.error || "Failed to register property");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      console.error("Property registration error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,46 +186,26 @@ export default function HostPage() {
           Share your space, earn money, and join our hosting community.
         </p>
 
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit} className="host-form">
           <input
             type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
+            name="title"
+            placeholder="Property Title"
+            value={formData.title}
             onChange={handleChange}
             required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            required
+            disabled={loading}
           />
           <input
             type="text"
-            name="location"
-            placeholder="Property Location"
-            value={formData.location}
+            name="landmark"
+            placeholder="Landmark / Area"
+            value={formData.landmark}
             onChange={handleChange}
             required
-          />
-          <input
-            type="text"
-            name="area"
-            placeholder="Area / Landmark"
-            value={formData.area}
-            onChange={handleChange}
-            required
+            disabled={loading}
           />
           <input
             type="text"
@@ -122,23 +214,36 @@ export default function HostPage() {
             value={formData.pincode}
             onChange={handleChange}
             required
+            disabled={loading}
           />
           <input
             type="text"
-            name="address"
+            name="fullAddress"
             placeholder="Full Address"
-            value={formData.address}
+            value={formData.fullAddress}
             onChange={handleChange}
             required
+            disabled={loading}
           />
           <input
             type="number"
-            name="price"
+            name="pricePerNight"
             placeholder="Price per Night (₹)"
-            value={formData.price}
+            value={formData.pricePerNight}
             onChange={handleChange}
             required
             min="0"
+            disabled={loading}
+          />
+          <input
+            type="number"
+            name="capacity"
+            placeholder="Capacity (Number of people)"
+            value={formData.capacity}
+            onChange={handleChange}
+            required
+            min="1"
+            disabled={loading}
           />
           <textarea
             name="description"
@@ -147,18 +252,52 @@ export default function HostPage() {
             onChange={handleChange}
             required
             rows="4"
+            disabled={loading}
           ></textarea>
 
+          {/* Property Image Upload */}
           <div className="image-upload-section">
-            <label>Upload Images for Each Wall</label>
-            {['front', 'back', 'left', 'right'].map((wall) => (
+            <label>Property Main Image (Optional)</label>
+            <div className="property-image-upload">
+              {propertyImagePreview ? (
+                <div className="image-preview-box">
+                  <img src={propertyImagePreview} alt="Property" />
+                  <button 
+                    type="button" 
+                    onClick={removePropertyImage}
+                    disabled={loading}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePropertyImageUpload}
+                  disabled={loading}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Wall Images Upload */}
+          <div className="image-upload-section">
+            <label>Upload Images for Each Wall (Required)</label>
+            {['frontWall', 'backWall', 'leftWall', 'rightWall'].map((wall) => (
               <div key={wall} className="wall-upload-box">
-                <label className="wall-label">{wall.charAt(0).toUpperCase() + wall.slice(1)} Wall:</label>
-                {wallImages[wall] ? (
+                <label className="wall-label">
+                  {wall.replace('Wall', '')} Wall:
+                </label>
+                {wallImagePreviews[wall] ? (
                   <div className="image-preview-box">
-                    <img src={wallImages[wall].url} alt={`${wall} wall`} />
-                    <button type="button" onClick={() => removeWallImage(wall)}>
-                      ×
+                    <img src={wallImagePreviews[wall]} alt={`${wall} wall`} />
+                    <button 
+                      type="button" 
+                      onClick={() => removeWallImage(wall)}
+                      disabled={loading}
+                    >
+                      Remove
                     </button>
                   </div>
                 ) : (
@@ -166,14 +305,20 @@ export default function HostPage() {
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleWallImageUpload(e, wall)}
+                    disabled={loading}
+                    required
                   />
                 )}
               </div>
             ))}
           </div>
 
-          <button type="submit" className="submit-button">
-            Submit Property
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={loading}
+          >
+            {loading ? "Registering Property..." : "Submit Property"}
           </button>
         </form>
       </div>
