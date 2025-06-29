@@ -1,6 +1,20 @@
 // pages/PropertyDetails.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import {
+  MapPin,
+  Home,
+  Mail,
+  Users,
+  IndianRupee,
+  Info,
+  Ruler,
+  Phone,
+  User,
+  Star,
+  CheckCircle
+} from "lucide-react";
+
 import apiService from "../services/api.js";
 import "./../Styles/PropertyDetails.css";
 
@@ -66,7 +80,7 @@ const PropertyDetails = () => {
 
   const handleRentClick = () => {
     if (property.pricePerNight === 0) {
-      alert("✅ Proceeding to accommodate in the shelter...");
+      alert("Proceeding to accommodate in the shelter...");
       setTimeout(() => {
         navigate("/accommodation", { state: { property } });
       }, 1000);
@@ -163,25 +177,26 @@ const PropertyDetails = () => {
 
         <div className="property-info">
           <h2>{property.title}</h2>
-          <p><strong>📍 Location:</strong> {property.landmark}</p>
-          <p><strong>🏘️ Address:</strong> {property.fullAddress}</p>
-          <p><strong>📮 Pincode:</strong> {property.pincode}</p>
-          <p><strong>👥 Capacity:</strong> {property.capacity} people</p>
-          <p><strong>💰 Price per Night:</strong> ₹{property.pricePerNight === 0 ? "Free" : property.pricePerNight}</p>
-          <p><strong>ℹ️ Description:</strong> {property.description}</p>
-          <p><strong>📧 Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
-          <p><strong>📱 Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
-          <p><strong>📊 Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
-          <p><strong>⭐ Rating:</strong> {property.star}/5</p>
-          
-          {property.createdBy && (
-            <div className="host-info">
-              <h3>Host Information</h3>
-              <p><strong>Name:</strong> {property.createdBy.fullName}</p>
-              <p><strong>Email:</strong> {property.createdBy.email}</p>
-              <p><strong>Phone:</strong> {property.createdBy.phone}</p>
-            </div>
-          )}
+          <p><MapPin style={{ marginRight: "6px" }} /> <strong>Location:</strong> {property.location || property.landmark}</p>
+<p><Home style={{ marginRight: "6px" }} /> <strong>Address:</strong> {property.fullAddress}</p>
+<p><Mail style={{ marginRight: "6px" }} /> <strong>Pincode:</strong> {property.pincode}</p>
+<p><Users style={{ marginRight: "6px" }} /> <strong>Capacity:</strong> {property.capacity} people</p>
+<p><IndianRupee style={{ marginRight: "6px" }} /> <strong>Price per Night:</strong> ₹{property.pricePerNight === 0 ? "Free" : property.pricePerNight}</p>
+<p><Info style={{ marginRight: "6px" }} /> <strong>Description:</strong> {property.description}</p>
+<p><Ruler style={{ marginRight: "6px" }} /> <strong>Distance:</strong> {property.distance}</p>
+<p><Mail style={{ marginRight: "6px" }} /> <strong>Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
+<p><Phone style={{ marginRight: "6px" }} /> <strong>Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
+<p><CheckCircle style={{ marginRight: "6px" }} /> <strong>Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
+<p><Star style={{ marginRight: "6px" }} /> <strong>Rating:</strong> {property.star}/5</p>
+
+{property.createdBy && (
+  <div className="host-info">
+    <h3><User style={{ marginRight: "6px" }} /> Host Information</h3>
+    <p><strong>Name:</strong> {property.createdBy.fullName}</p>
+    <p><strong>Email:</strong> {property.createdBy.email}</p>
+    <p><strong>Phone:</strong> {property.createdBy.phone}</p>
+  </div>
+)}
         </div>
       </div>
 
@@ -190,7 +205,7 @@ const PropertyDetails = () => {
           Rent
         </button>
         <button className="transport-btn" onClick={handleTransportClick}>
-          Transport Facility
+          Book Transport
         </button>
       </div>
     </div>

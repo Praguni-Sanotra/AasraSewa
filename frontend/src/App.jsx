@@ -16,29 +16,28 @@ import Signup from "./Pages/Signup";
 import LoginPage from "./Pages/LoginPage";
 import Home from "./Pages/Home";
 import Host from "./Pages/Host";
-import Results from "./Pages/Filter";
+import Filter from "./Pages/Filter"; // ✅ Using your existing page
+import ResultsPage from "./Pages/Property"; // ✅ Separate results display
 import PropertyDetails from "./Pages/PropertyDetails";
 import Payment from "./Pages/Payment";
 import Accommodation from "./Pages/Accommodation";
+import Transport from "./Pages/Transport";
 import ProtectedRoute from "./auth/ProtectedRoutes.jsx";
 
-// Layout component
 const Layout = () => {
   const location = useLocation();
-  const isAuthPage =
-    location.pathname === "/signup" || location.pathname === "/login";
+  const isAuthPage = location.pathname === "/signup" || location.pathname === "/login";
 
   return (
     <div className="app-wrapper">
-      {/* Conditionally render Header */}
       {!isAuthPage && <Header />}
 
-      {/* Main Content */}
       <main className="app-main container">
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<LoginPage />} />
+
           <Route
             path="/home"
             element={
@@ -48,6 +47,8 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/filter" element={<ProtectedRoute><Filter /></ProtectedRoute>} /> {/* ✅ Filter Page */}
+          
           <Route
             path="/host"
             element={
@@ -100,13 +101,11 @@ const Layout = () => {
         </Routes>
       </main>
 
-      {/* Conditionally render Footer */}
       {!isAuthPage && <Footer />}
     </div>
   );
 };
 
-// App wrapper
 const App = () => (
   <AuthProvider>
     <Router>

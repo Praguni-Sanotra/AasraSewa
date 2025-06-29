@@ -181,14 +181,14 @@ const Results = () => {
                 onChange={(e) => setFilters({ ...filters, minCost: e.target.value })}
               />
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={onlyFree}
-                  onChange={(e) => setOnlyFree(e.target.checked)}
-                />
-                Show only Free of Cost Houses
-              </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={onlyFree}
+                onChange={(e) => setOnlyFree(e.target.checked)}
+              />
+              Show only Free of Cost Houses
+            </label>
 
               <label>Sort by Cost:</label>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -272,4 +272,4 @@ const Results = () => {
   );
 };
 
-export default Results;
+export default FilterControls;
