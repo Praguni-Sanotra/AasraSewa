@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import propertySchema from "./property.model.js";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
@@ -21,7 +20,6 @@ const userSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Other"],
     },
     isHost: { type: Boolean, default: false },
-    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
   },
   {
     timestamps: true,

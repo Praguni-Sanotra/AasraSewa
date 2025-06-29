@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const propertySchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -7,6 +6,11 @@ const propertySchema = new mongoose.Schema(
     pricePerNight: { type: Number, required: true, min: 0 },
     description: { type: String, required: true, maxlength: 500, trim: true },
     capacity: { type: Number, required: true, min: 1 },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     propertyImage: {
       type: String,
       default:
