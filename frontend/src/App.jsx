@@ -1,4 +1,3 @@
-// App.js or App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -12,30 +11,31 @@ import Header from "./Components/Header";
 import HeroSection from "./Components/HeroSection";
 import Footer from "./Components/Footer";
 
-import Login from "./Pages/login";
+import Signup from "./Pages/Signup";
+import LoginPage from "./Pages/LoginPage"; // ✅ Added LoginPage import
 import Home from "./Pages/Home";
 import Host from "./Pages/Host";
 import Results from "./Pages/Filter";
-import House from "./Pages/House";
 import PropertyDetails from "./Pages/PropertyDetails";
 import Payment from "./Pages/Payment";
-import Accommodation from "./Pages/Accommodation"; // ✅ Added Accommodation page
+import Accommodation from "./Pages/Accommodation";
 
 // Layout component
 const Layout = () => {
   const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
+  const isAuthPage = location.pathname === "/signup" || location.pathname === "/login"; // ✅ Changed
 
   return (
     <div className="app-wrapper">
       {/* Conditionally render Header */}
-      {!isLoginPage && <Header />}
+      {!isAuthPage && <Header />}
 
       {/* Main Content */}
       <main className="app-main container">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Navigate to="/login" replace />} /> {/* ✅ Default to login */}
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<LoginPage />} /> {/* ✅ Added login page */}
 
           <Route
             path="/home"
@@ -48,9 +48,6 @@ const Layout = () => {
           />
           <Route path="/host" element={<Host />} />
           <Route path="/results" element={<Results />} />
-          <Route path="/house" element={<House />} />
-
-          {/* ✅ New Routes */}
           <Route path="/property/:id" element={<PropertyDetails />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/accommodation" element={<Accommodation />} />
@@ -67,7 +64,7 @@ const Layout = () => {
       </main>
 
       {/* Conditionally render Footer */}
-      {!isLoginPage && <Footer />}
+      {!isAuthPage && <Footer />}
     </div>
   );
 };

@@ -1,5 +1,3 @@
-/* HostPage.css */
-
 .host-wrapper {
   min-height: 100vh;
   display: flex;
@@ -17,6 +15,7 @@
   width: 100%;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
   border: 1px solid #e2e8f0;
+  color: #000000;
 }
 
 .host-title {
@@ -24,7 +23,7 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 0.25rem;
-  color: #1e3a8a;
+  color: #000000;
 }
 
 .highlight {
@@ -33,7 +32,7 @@
 
 .host-subtitle {
   text-align: center;
-  color: #6b7280;
+  color: #000000;
   margin-bottom: 1.5rem;
   font-size: 1rem;
 }
@@ -47,6 +46,7 @@
   border-radius: 12px;
   font-size: 1rem;
   background-color: #ffffff;
+  color: #000000;
   outline: none;
   transition: border-color 0.3s ease;
 }
@@ -61,24 +61,19 @@
   resize: none;
 }
 
-.image-upload-section label {
+.image-upload-section label,
+.wall-label {
   display: block;
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 0.5rem;
-  color: #374151;
+  color: #000000;
 }
 
 .image-upload-section input[type="file"] {
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  color: #1f2937;
-}
-
-.image-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 1rem;
+  color: #000000;
 }
 
 .image-preview-box {
