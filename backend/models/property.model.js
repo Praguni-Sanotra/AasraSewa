@@ -38,4 +38,4 @@ const propertySchema = new mongoose.Schema(
   }
 );
 
-export default propertySchema;
+export default mongoose.model("Property", propertySchema);

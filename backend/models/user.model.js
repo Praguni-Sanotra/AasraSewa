@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Other"],
     },
     isHost: { type: Boolean, default: false },
-    properties: [propertySchema],
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
   },
   {
     timestamps: true,
