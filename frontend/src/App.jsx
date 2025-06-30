@@ -16,8 +16,7 @@ import Signup from "./Pages/Signup";
 import LoginPage from "./Pages/LoginPage";
 import Home from "./Pages/Home";
 import Host from "./Pages/Host";
-import Filter from "./Pages/Filter"; // ✅ Using your existing page
-import ResultsPage from "./Pages/Property"; // ✅ Separate results display
+import Filter from "./Pages/Filter";
 import PropertyDetails from "./Pages/PropertyDetails";
 import Payment from "./Pages/Payment";
 import Accommodation from "./Pages/Accommodation";
@@ -47,7 +46,7 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/filter" element={<ProtectedRoute><Filter /></ProtectedRoute>} /> {/* ✅ Filter Page */}
+          <Route path="/filter" element={<ProtectedRoute><Filter /></ProtectedRoute>} />
           
           <Route
             path="/host"
@@ -61,7 +60,7 @@ const Layout = () => {
             path="/results"
             element={
               <ProtectedRoute>
-                <Results />
+                <Filter />
               </ProtectedRoute>
             }
           />
@@ -74,7 +73,7 @@ const Layout = () => {
             }
           />
           <Route
-            path="/payment"
+            path="/payment/:id"
             element={
               <ProtectedRoute>
                 <Payment />
@@ -89,8 +88,17 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/transport"
+            element={
+              <ProtectedRoute>
+                <Transport />
+              </ProtectedRoute>
+            }
+          />
           {/* Redirect from old route */}
           <Route path="/explore" element={<Navigate to="/home" replace />} />
+
           {/* 404 Not Found */}
           <Route
             path="*"

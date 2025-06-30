@@ -7,7 +7,7 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-const Results = () => {
+const Filter = () => {
   const query = useQuery();
   const navigate = useNavigate();
   const defaultMembers = parseInt(query.get("members")) || 0;
@@ -272,4 +272,4 @@ const Results = () => {
   );
 };
 
-export default FilterControls;
+export default Filter;

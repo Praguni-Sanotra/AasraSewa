@@ -85,7 +85,7 @@ const PropertyDetails = () => {
         navigate("/accommodation", { state: { property } });
       }, 1000);
     } else {
-      navigate("/payment", { state: { property } });
+      navigate(`/payment/${property._id}`);
     }
   };
 

@@ -68,11 +68,6 @@ function DropdownButton({ open, setOpen }) {
       {open && (
         <div className="dropdown-menu">
           <ul className="dropdown-list">
-            {user && (
-              <li className="dropdown-item user-info">
-                Welcome, {user.fullName}
-              </li>
-            )}
             <li className="dropdown-item">Help Center</li>
             <li className="dropdown-item">Settings</li>
             <li className="dropdown-item logout" onClick={handleLogout}>
