@@ -1,0 +1,5 @@
+ultralytics==8.0.20
+fpdf
+requests
+Pillow
+openai
