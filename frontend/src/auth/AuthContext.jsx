@@ -17,15 +17,30 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = async (credentials) => {
+    // Clear previous auth state immediately when login starts
+    setIsAuthenticated(false);
+    setUser(null);
+    setLoading(true);
     try {
       const response = await apiService.login(credentials);
-      setIsAuthenticated(true);
-      setUser(response.user);
-      return { success: true, data: response };
+      if (response.success) {
+        setIsAuthenticated(true);
+        setUser(response.data.user);
+        console.log("[AuthContext] Login success:", response.data.user);
+        return { success: true, data: response.data };
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+        console.log("[AuthContext] Login failed:", response.error);
+        return { success: false, error: response.error };
+      }
     } catch (error) {
       setIsAuthenticated(false);
       setUser(null);
+      console.log("[AuthContext] Login failed:", error.message);
       return { success: false, error: error.message };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,11 +58,12 @@ export const AuthProvider = ({ children }) => {
       await apiService.logout();
       setIsAuthenticated(false);
       setUser(null);
+      console.log("[AuthContext] Logout success");
       return { success: true };
     } catch (error) {
-      // Even if logout fails, clear local state
       setIsAuthenticated(false);
       setUser(null);
+      console.log("[AuthContext] Logout failed:", error.message);
       return { success: false, error: error.message };
     }
   };
@@ -58,8 +74,9 @@ export const AuthProvider = ({ children }) => {
       const authResult = await apiService.checkAuth();
       setIsAuthenticated(authResult.isAuthenticated);
       setUser(authResult.user || null);
+      console.log("[AuthContext] refreshAuth:", authResult);
     } catch (error) {
-      console.error('Auth refresh error:', error);
+      console.error("[AuthContext] Auth refresh error:", error);
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -72,15 +89,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        isAuthenticated, 
-        loading, 
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        loading,
         user,
         login,
         logout,
         register,
-        refreshAuth 
+        refreshAuth,
       }}
     >
       {children}

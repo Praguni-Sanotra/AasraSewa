@@ -44,13 +44,29 @@ const Signup = () => {
 
     // Validate required fields
     const requiredFields = [
-      "fullName", "email", "password", "phone", "age", 
-      "gender", "bloodGroup", "address"
+      "fullName",
+      "email",
+      "password",
+      "phone",
+      "age",
+      "gender",
+      "bloodGroup",
+      "address",
     ];
-    
-    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
-      setError(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      setError(
+        `Please fill in all required fields: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError(
+        "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character."
+      );
       return;
     }
 
@@ -63,10 +79,14 @@ const Signup = () => {
 
     try {
       // Upload aadhaar image to Cloudinary
-      const uploadResult = await cloudinaryService.uploadImage(aadhaarImage, 'aadhaar');
-      
+      const uploadResult = await cloudinaryService.uploadImage(
+        aadhaarImage,
+        "aadhaar"
+      );
+
       if (!uploadResult.success) {
         setError("Failed to upload Aadhaar image. Please try again.");
+        setLoading(false);
         return;
       }
 
@@ -76,7 +96,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
-        age: parseInt(formData.age),
+        age: parseInt(formData.age, 10),
         gender: formData.gender,
         bloodGroup: formData.bloodGroup,
         address: formData.address,
@@ -84,15 +104,18 @@ const Signup = () => {
       };
 
       const result = await register(userData);
+      console.log("Register result:", result);
 
-      if (result.success) {
+      if (result.data.success) {
         // Registration successful, redirect to login
-        navigate("/login", { 
-          state: { message: "Registration successful! Please login." }
+        navigate("/login", {
+          state: {
+            message: result.message || "Registration successful! Please login.",
+          },
         });
       } else {
-        console.error("Registration failed:", result.error);
-        setError(result.error || "Registration failed");
+        // Registration failed, show error and DO NOT navigate
+        setError(result.data.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -111,7 +134,15 @@ const Signup = () => {
         <h2>AasraSewa - User SignUp</h2>
         <p>Enter your details to access emergency services</p>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div
+            className="error-message"
+            style={{ color: "red", fontWeight: "bold", marginBottom: "1rem" }}
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {[
@@ -170,7 +201,9 @@ const Signup = () => {
 
           {/* Aadhaar Upload Section */}
           <div className="aadhaar-section">
-            <label className="login-label">Upload Aadhaar Photo (Required):</label>
+            <label className="login-label">
+              Upload Aadhaar Photo (Required):
+            </label>
             <div className="aadhaar-upload-area">
               {aadhaarPreview ? (
                 <div className="aadhaar-preview-container">
@@ -187,13 +220,16 @@ const Signup = () => {
                     }}
                     className="signup-remove-aadhaar-btn"
                     disabled={loading}
+                    aria-label="Remove Aadhaar image"
                   >
-                    <TbXboxX className="signup-remove-aadhaar-btn-icon"/>
+                    <TbXboxX className="signup-remove-aadhaar-btn-icon" />
                   </button>
                 </div>
               ) : (
                 <>
-                  <span className="aadhaar-instruction">Click or tap to upload</span>
+                  <span className="aadhaar-instruction">
+                    Click or tap to upload
+                  </span>
                   <input
                     type="file"
                     name="aadhaarImage"
@@ -208,11 +244,7 @@ const Signup = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="login-button"
-            disabled={loading}
-          >
+          <button type="submit" className="login-button" disabled={loading}>
             {loading ? "Creating Account..." : "SignUp"}
           </button>
         </form>

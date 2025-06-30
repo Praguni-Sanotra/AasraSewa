@@ -24,31 +24,72 @@ export const register = async (req, res) => {
       gender,
     } = req.body;
 
-    // Validate required fields
-    if (
-      !fullName ||
-      !email ||
-      !password ||
-      !phone ||
-      !age ||
-      !bloodGroup ||
-      !address ||
-      !aadhaarImage ||
-      !gender
-    ) {
+    // Check required fields individually with precise messages
+    if (!fullName) {
       return res
         .status(400)
-        .json({ message: "All fields are required", success: false });
+        .json({ message: "Full name is required", success: false });
+    }
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Email is required", success: false });
+    }
+    if (!password) {
+      return res
+        .status(400)
+        .json({ message: "Password is required", success: false });
+    }
+    // Strong password validation regex
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.",
+        success: false,
+      });
     }
 
-    // Email format check
+    if (!phone) {
+      return res
+        .status(400)
+        .json({ message: "Phone number is required", success: false });
+    }
+    if (!age) {
+      return res
+        .status(400)
+        .json({ message: "Age is required", success: false });
+    }
+    if (!bloodGroup) {
+      return res
+        .status(400)
+        .json({ message: "Blood group is required", success: false });
+    }
+    if (!address) {
+      return res
+        .status(400)
+        .json({ message: "Address is required", success: false });
+    }
+    if (!aadhaarImage) {
+      return res
+        .status(400)
+        .json({ message: "Aadhaar image is required", success: false });
+    }
+    if (!gender) {
+      return res
+        .status(400)
+        .json({ message: "Gender is required", success: false });
+    }
+
+    // Existing validations...
     if (!isValidEmail(email)) {
       return res
         .status(400)
         .json({ message: "Invalid email format", success: false });
     }
 
-    // Validate phone number: exactly 10 digits, no other characters
     if (!/^\d{10}$/.test(phone)) {
       return res.status(400).json({
         message: "Phone number must be exactly 10 digits",
@@ -56,28 +97,26 @@ export const register = async (req, res) => {
       });
     }
 
-    // Age check
     if (age < 18) {
-      return res
-        .status(400)
-        .json({ message: "Age must be 18 or above", success: false });
+      return res.status(400).json({
+        message: "Age must be 18 or above",
+        success: false,
+      });
     }
 
-    // Blood group check
     if (!BLOOD_GROUPS.includes(bloodGroup)) {
       return res
         .status(400)
         .json({ message: "Invalid blood group", success: false });
     }
 
-    // Gender check
     if (!GENDERS.includes(gender)) {
       return res
         .status(400)
         .json({ message: "Invalid gender value", success: false });
     }
 
-    // Check if email already exists (only email uniqueness check)
+    // Check if email exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -86,7 +125,7 @@ export const register = async (req, res) => {
         .json({ message: "Email already registered", success: false });
     }
 
-    // Create user (password gets hashed via schema pre-save hook)
+    // Create user
     const newUser = await User.create({
       fullName,
       email,
@@ -104,11 +143,21 @@ export const register = async (req, res) => {
       user: {
         id: newUser._id,
         email: newUser.email,
+        fullName: newUser.fullName,
       },
       success: true,
     });
   } catch (error) {
     console.error("Error in register:", error);
+
+    // MongoDB duplicate key error for email unique constraint (double check)
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+      return res.status(400).json({
+        message: "Email already registered",
+        success: false,
+      });
+    }
+
     res.status(500).json({ message: "Internal server error", success: false });
   }
 };
@@ -277,9 +326,9 @@ export const updateUser = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.id; // `req.id` is set from isAuthenticated middleware
-    
+
     const user = await User.findById(userId).select("-password");
-    
+
     if (!user) {
       return res.status(404).json({
         message: "User not found",
