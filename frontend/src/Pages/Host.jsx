@@ -41,9 +41,9 @@ export default function HostPage() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ 
-      ...formData, 
-      [name]: type === 'checkbox' ? checked : value 
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -91,21 +91,30 @@ export default function HostPage() {
 
     // Validate required fields
     const requiredFields = [
-      "title", "landmark", "pincode", "fullAddress", 
-      "pricePerNight", "description", "capacity"
+      "title",
+      "landmark",
+      "pincode",
+      "fullAddress",
+      "pricePerNight",
+      "description",
+      "capacity",
     ];
-    
-    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
-      setError(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      setError(
+        `Please fill in all required fields: ${missingFields.join(", ")}`
+      );
       return;
     }
 
     // Check if all wall images are uploaded
-    const requiredWalls = ['frontWall', 'backWall', 'leftWall', 'rightWall'];
-    const missingWalls = requiredWalls.filter(wall => !wallImages[wall]);
+    const requiredWalls = ["frontWall", "backWall", "leftWall", "rightWall"];
+    const missingWalls = requiredWalls.filter((wall) => !wallImages[wall]);
     if (missingWalls.length > 0) {
-      setError(`Please upload images for all walls: ${missingWalls.join(", ")}`);
+      setError(
+        `Please upload images for all walls: ${missingWalls.join(", ")}`
+      );
       return;
     }
 
@@ -115,7 +124,10 @@ export default function HostPage() {
       // Upload property image if provided
       let propertyImageUrl = null;
       if (propertyImage) {
-        const propertyUploadResult = await cloudinaryService.uploadImage(propertyImage, 'properties');
+        const propertyUploadResult = await cloudinaryService.uploadImage(
+          propertyImage,
+          "properties"
+        );
         if (!propertyUploadResult.success) {
           setError("Failed to upload property image. Please try again.");
           return;
@@ -124,15 +136,19 @@ export default function HostPage() {
       }
 
       // Upload all wall images
-      const wallUploadPromises = Object.entries(wallImages).map(async ([wall, file]) => {
-        const result = await cloudinaryService.uploadImage(file, 'walls');
-        return { wall, result };
-      });
+      const wallUploadPromises = Object.entries(wallImages).map(
+        async ([wall, file]) => {
+          const result = await cloudinaryService.uploadImage(file, "walls");
+          return { wall, result };
+        }
+      );
 
       const wallUploadResults = await Promise.all(wallUploadPromises);
-      
+
       // Check if all wall uploads were successful
-      const failedUploads = wallUploadResults.filter(({ result }) => !result.success);
+      const failedUploads = wallUploadResults.filter(
+        ({ result }) => !result.success
+      );
       if (failedUploads.length > 0) {
         setError("Failed to upload some wall images. Please try again.");
         return;
@@ -144,26 +160,39 @@ export default function HostPage() {
         images[wall] = result.url;
       });
 
-      // Prepare property data
+      // 1. Call building health backend for analysis
+      const propertyId = `${user?.id || "guest"}_${Date.now()}`; // unique property id
+      const analyzeResponse = await fetch("http://localhost:5001/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images, // { frontWall: url, backWall: url, ... }
+          propertyId,
+        }),
+      });
+      const analyzeResult = await analyzeResponse.json();
+      if (!analyzeResponse.ok) {
+        setError(analyzeResult.message || "Building health analysis failed");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Save the property with propertyId (so you can fetch the PDF later)
       const propertyData = {
-        title: formData.title,
-        landmark: formData.landmark,
-        pincode: formData.pincode,
-        fullAddress: formData.fullAddress,
-        pricePerNight: parseFloat(formData.pricePerNight),
-        description: formData.description,
-        capacity: parseInt(formData.capacity),
+        ...formData,
         images,
         propertyImage: propertyImageUrl,
+        propertyId, // save this!
       };
-
-      // Register property with backend
       const result = await apiService.registerProperty(propertyData);
 
       if (result.success) {
         // Property registered successfully
-        navigate("/home", { 
-          state: { message: "Property registered successfully! It will be reviewed by admin." }
+        navigate("/home", {
+          state: {
+            message:
+              "Property registered successfully! It will be reviewed by admin.",
+          },
         });
       } else {
         setError(result.error || "Failed to register property");
@@ -262,8 +291,8 @@ export default function HostPage() {
               {propertyImagePreview ? (
                 <div className="image-preview-box">
                   <img src={propertyImagePreview} alt="Property" />
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={removePropertyImage}
                     disabled={loading}
                   >
@@ -284,16 +313,16 @@ export default function HostPage() {
           {/* Wall Images Upload */}
           <div className="image-upload-section">
             <label>Upload Images for Each Wall (Required)</label>
-            {['frontWall', 'backWall', 'leftWall', 'rightWall'].map((wall) => (
+            {["frontWall", "backWall", "leftWall", "rightWall"].map((wall) => (
               <div key={wall} className="wall-upload-box">
                 <label className="wall-label">
-                  {wall.replace('Wall', '')} Wall:
+                  {wall.replace("Wall", "")} Wall:
                 </label>
                 {wallImagePreviews[wall] ? (
                   <div className="image-preview-box">
                     <img src={wallImagePreviews[wall]} alt={`${wall} wall`} />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => removeWallImage(wall)}
                       disabled={loading}
                     >
@@ -313,11 +342,7 @@ export default function HostPage() {
             ))}
           </div>
 
-          <button 
-            type="submit" 
-            className="submit-button"
-            disabled={loading}
-          >
+          <button type="submit" className="submit-button" disabled={loading}>
             {loading ? "Registering Property..." : "Submit Property"}
           </button>
         </form>

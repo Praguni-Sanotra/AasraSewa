@@ -1,6 +1,16 @@
 import Property from "../models/property.model.js";
 import mongoose from "mongoose";
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// ========================
+// Register New Property
+// ========================
 export const registerProperty = async (req, res) => {
   try {
     const {
@@ -46,10 +56,28 @@ export const registerProperty = async (req, res) => {
       capacity: Number(capacity),
       createdBy,
       images,
-      propertyImage, // optional
+      propertyImage,
     });
 
     const savedProperty = await newProperty.save();
+
+    // === 🔁 Trigger Python Script ===
+    const scriptPath = path.join(
+      __dirname,
+      "../../building_health/building_health_report.py"
+    );
+    const imageJson = JSON.stringify(savedProperty.images);
+    const propertyId = savedProperty._id.toString();
+
+    const pythonProcess = spawn("python3", [scriptPath, imageJson, propertyId]);
+
+    pythonProcess.stdout.on("data", (data) => {
+      console.log(`📥 PYTHON STDOUT: ${data}`);
+    });
+
+    pythonProcess.stderr.on("data", (data) => {
+      console.error(`❌ PYTHON ERROR: ${data}`);
+    });
 
     res.status(201).json({
       message: "Property registered successfully.",
@@ -63,6 +91,9 @@ export const registerProperty = async (req, res) => {
   }
 };
 
+// ========================
+// Get All Properties
+// ========================
 export const getAllPropertiesWithOptionalFilters = async (req, res) => {
   try {
     const {
@@ -77,7 +108,6 @@ export const getAllPropertiesWithOptionalFilters = async (req, res) => {
     const filters = {};
     const shouldFilter = minCost || maxCost || members;
 
-    // Apply filters only if at least one is passed
     if (shouldFilter) {
       filters.status = "approved";
       filters.isBooked = false;
@@ -116,6 +146,9 @@ export const getAllPropertiesWithOptionalFilters = async (req, res) => {
   }
 };
 
+// ========================
+// Get Properties By Logged-in User
+// ========================
 export const getMyProperties = async (req, res) => {
   try {
     if (!req.id) {
@@ -142,30 +175,29 @@ export const getMyProperties = async (req, res) => {
   }
 };
 
+// ========================
+// Update Property
+// ========================
 export const updateMyProperty = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid property ID." });
     }
 
-    // Find property
     const property = await Property.findById(id);
 
     if (!property) {
       return res.status(404).json({ message: "Property not found." });
     }
 
-    // Check ownership
     if (property.createdBy.toString() !== req.id) {
       return res
         .status(403)
         .json({ message: "You are not authorized to update this property." });
     }
 
-    // List of allowed fields to update
     const allowedUpdates = [
       "title",
       "landmark",
@@ -178,17 +210,16 @@ export const updateMyProperty = async (req, res) => {
       "propertyImage",
     ];
 
-    // Apply updates from request body
     allowedUpdates.forEach((field) => {
       if (req.body[field] !== undefined) {
         property[field] = req.body[field];
       }
     });
-    // If property was approved earlier, reset status to pending
+
     if (property.status === "approved") {
       property.status = "pending";
     }
-    // Save updated property
+
     const updatedProperty = await property.save();
 
     res.status(200).json({
@@ -201,20 +232,20 @@ export const updateMyProperty = async (req, res) => {
   }
 };
 
-// Get property by ID
+// ========================
+// Get Property By ID
+// ========================
 export const getPropertyById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid property ID." });
     }
 
-    // Find property and populate creator info
     const property = await Property.findById(id)
-      .populate('createdBy', 'fullName email phone')
-      .select('-__v');
+      .populate("createdBy", "fullName email phone")
+      .select("-__v");
 
     if (!property) {
       return res.status(404).json({ message: "Property not found." });

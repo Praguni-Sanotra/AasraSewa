@@ -2,11 +2,10 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
 const isDev = process.env.NODE_ENV !== "production";
-
 // General rate limiting for all API routes
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDev ? 1000 : 100, // higher limit for dev
+  max: isDev ? 1000 : 100, // higher limit in dev, stricter in prod
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -15,7 +14,7 @@ export const generalLimiter = rateLimit({
 // Stricter rate limit for authentication routes
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDev ? 500 : 50, // higher limit for dev
+  max: isDev ? 500 : 50, // higher limit for dev, lower for prod
   message: "Too many authentication attempts, please try again later.",
 });
 
