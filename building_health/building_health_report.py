@@ -6,15 +6,28 @@ from fpdf import FPDF
 from dotenv import load_dotenv
 import openai
 import urllib.request
+import cloudinary.uploader
+import cloudinary.api
+import cloudinary
 
+# Load environment variables
 load_dotenv()
 
-# Setup logging
+# Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+# OpenAI API Key
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Cloudinary config (explicit)
+cloudinary.config(
+    cloud_name="dfdfmx8mo",
+    api_key="627233848483887",
+    api_secret="QJ9xBrqzhxqgpC3gtwAywNxOrCc",
+    secure=True
+)
+
+# Paths
 YOLO_MODEL_PATH = "/Users/pragunisanotra/runs/detect/train11/weights/best.pt"
 OUTPUT_DIR = "output_reports"
 PROCESSED_DIR = os.path.join(OUTPUT_DIR, "processed")
@@ -23,12 +36,10 @@ PDF_DIR = os.path.join(OUTPUT_DIR, "pdfs")
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(PDF_DIR, exist_ok=True)
 
-
 def download_image(image_url, save_path):
     urllib.request.urlretrieve(image_url, save_path)
     logging.info(f"📥 Downloaded image to {save_path}")
     return save_path
-
 
 def detect_cracks(image_path):
     model = YOLO(YOLO_MODEL_PATH)
@@ -50,7 +61,6 @@ def detect_cracks(image_path):
 
     return processed_path, crack_count, confidences
 
-
 def generate_analysis(image_scores, avg_score):
     analysis = "AI-Based Structural Crack Analysis:\n"
     analysis += f"\nOverall Average Score (out of 10): {avg_score:.1f}\n\n"
@@ -69,7 +79,6 @@ def generate_analysis(image_scores, avg_score):
 
     analysis += f"\nSeverity Level: {severity}\nRecommendation: {recommendation}"
     return analysis
-
 
 def generate_pdf_report(image_data, property_id, analysis):
     pdf = FPDF()
@@ -100,6 +109,15 @@ def generate_pdf_report(image_data, property_id, analysis):
     logging.info(f"📄 PDF saved at {pdf_path}")
     return pdf_path
 
+def upload_pdf_to_cloudinary(pdf_path):
+    try:
+        result = cloudinary.uploader.upload(pdf_path, resource_type="raw")
+        cloud_url = result.get("secure_url")
+        logging.info(f"☁️ Uploaded PDF to Cloudinary: {cloud_url}")
+        return cloud_url
+    except Exception as e:
+        logging.error(f"❌ Cloudinary upload failed: {e}")
+        return None
 
 def generate_building_health_report(image_urls_dict, property_id):
     if not (4 <= len(image_urls_dict) <= 6):
@@ -108,7 +126,6 @@ def generate_building_health_report(image_urls_dict, property_id):
     local_image_paths = {}
     image_scores = {}
     total_score = 0
-    total_cracks = 0
     total_confidences = []
 
     for wall, url in image_urls_dict.items():
@@ -118,17 +135,16 @@ def generate_building_health_report(image_urls_dict, property_id):
         processed_img_path, crack_count, confidences = detect_cracks(img_local_path)
         local_image_paths[wall] = processed_img_path
 
-        # Calculate image score (scale of 0-10)
         score = 10 - crack_count * 1.5
         score = max(0, min(10, score))
         image_scores[wall] = score
         total_score += score
-        total_cracks += crack_count
         total_confidences.extend(confidences)
 
     avg_score = total_score / len(image_scores)
-    avg_conf = sum(total_confidences) / len(total_confidences) if total_confidences else 0
-
     analysis = generate_analysis(image_scores, avg_score)
 
-    return generate_pdf_report(local_image_paths, property_id, analysis)
+    pdf_path = generate_pdf_report(local_image_paths, property_id, analysis)
+    cloud_url = upload_pdf_to_cloudinary(pdf_path)
+
+    return cloud_url
