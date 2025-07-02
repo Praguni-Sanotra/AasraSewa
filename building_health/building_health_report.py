@@ -28,7 +28,7 @@ cloudinary.config(
 )
 
 # Paths
-YOLO_MODEL_PATH = "/Users/pragunisanotra/runs/detect/train11/weights/best.pt"
+YOLO_MODEL_PATH = os.path.join(os.getcwd(), "best.pt")
 OUTPUT_DIR = "output_reports"
 PROCESSED_DIR = os.path.join(OUTPUT_DIR, "processed")
 PDF_DIR = os.path.join(OUTPUT_DIR, "pdfs")
