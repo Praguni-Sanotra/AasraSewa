@@ -1,21 +1,55 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+
+import Login from './pages/Login';
+import HostVerification from './pages/HostVerification';
+import ActiveHosts from './pages/activehost';
+import Messages from './pages/message';
+import ActiveUsers from './pages/activeuser';
+import HostPDFViewer from './pages/HostPDFViewer';
+import HostDetails from './pages/HostDetails'; // ✅ Added import
 
 function App() {
-  const [active, setActive] = useState('host-verification')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [active, setActive] = useState('host-verification');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
 
   const handleNavClick = (section) => {
-    setActive(section)
-    setSidebarOpen(false)
+    setActive(section);
+    setSidebarOpen(false);
+  };
+
+  const renderMainContent = () => {
+    switch (active) {
+      case 'host-verification':
+        return <HostVerification />;
+      case 'active-hosts':
+        return <ActiveHosts />;
+      case 'messages':
+        return <Messages />;
+      case 'active-users':
+        return <ActiveUsers />;
+      default:
+        return <div>Page not found</div>;
+    }
+  };
+
+  if (!isLoggedIn) {
+    return <Login onLogin={handleLoginSuccess} />;
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-layout">
+      {/* Mobile Header */}
       <header className="mobile-header">
         <button
           className="hamburger"
-          aria-label="Open sidebar"
+          aria-label="Toggle sidebar"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           <span />
@@ -26,6 +60,8 @@ function App() {
           <span className="logo-dot" /> Admin
         </span>
       </header>
+
+      {/* Sidebar */}
       <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <h2>
@@ -56,50 +92,34 @@ function App() {
               className={active === 'active-users' ? 'active' : ''}
               onClick={() => handleNavClick('active-users')}
             >
-              <span className="icon">👤</span> Active Users
+              <span className="icon">🧑‍💻</span> Active Users
             </li>
           </ul>
         </nav>
       </aside>
-      <main className="main-content" onClick={() => sidebarOpen && setSidebarOpen(false)}>
-        <h1>Dashboard</h1>
-        {active === 'host-verification' && (
-          <section>
-            <h2>Host Verification</h2>
-            <p>This is the Host Verification section.</p>
-            <div className="pdf-container">
-              <iframe
-                src="/sample-property-report.pdf"
-                title="Property Analysis Report"
-                width="100%"
-                height="600px"
-                style={{ border: '1px solid #ccc', borderRadius: '8px' }}
-              />
-            </div>
-          </section>
-        )}
-        {active === 'active-hosts' && (
-          <section>
-            <h2>Active Hosts</h2>
-            <p>This is the Active Hosts section.</p>
-          </section>
-        )}
-        {active === 'messages' && (
-          <section>
-            <h2>Messages</h2>
-            <p>This is the Messages section.</p>
-          </section>
-        )}
-        {active === 'active-users' && (
-          <section>
-            <h2>Active Users</h2>
-            <p>This is the Active Users section.</p>
-          </section>
-        )}
+
+      {/* Main Content Area with Routes */}
+      <main
+        className="main-content"
+        onClick={() => sidebarOpen && setSidebarOpen(false)}
+      >
+        <Routes>
+          <Route path="/" element={renderMainContent()} />
+          <Route path="/host/:id/verify" element={<HostPDFViewer />} />
+          <Route path="/host/:id/details" element={<HostDetails />} /> {/* ✅ Added */}
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
       </main>
-      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Sidebar Backdrop */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

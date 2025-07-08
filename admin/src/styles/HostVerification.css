@@ -1,0 +1,30 @@
+/* Host Verification Section */
+.host-verification-section {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f9f9f9 70%, #e3e8ff 100%);
+  min-height: 100vh;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(60, 72, 88, 0.08);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #2d3a4a;
+  text-align: center;
+}
+
+.dashboard-subtitle {
+  font-size: 1.25rem;
+  color: #6c7a89;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+}
