@@ -13,11 +13,7 @@ const propertySchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    propertyImage: {
-      type: String,
-      default:
-        "https://images.icon-icons.com/3761/PNG/512/house_building_home_icon_231030.png",
-    },
+    propertyImage: { type: String },
     images: {
       frontWall: { type: String, required: true, trim: true },
       backWall: { type: String, required: true, trim: true },
@@ -29,11 +25,15 @@ const propertySchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    star: {
-      type: Number,
-      min: 0,
-      max: 5,
-      default: 0,
+    healthReportPDF: { type: String },
+    adminReview: {
+      rating: { type: Number, min: 1, max: 5 },
+      comment: { type: String, maxlength: 500 },
+      reviewedAt: { type: Date },
+      reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+      },
     },
     isBooked: { type: Boolean, default: false },
   },

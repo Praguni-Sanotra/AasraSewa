@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Male", "Female", "Other"],
     },
+    face: { type: String },
     isHost: { type: Boolean, default: false },
   },
   {
