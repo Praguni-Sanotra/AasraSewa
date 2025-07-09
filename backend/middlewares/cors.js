@@ -3,27 +3,33 @@ import cors from "cors";
 // Define allowed origins for CORS
 const allowedOrigins = [
   "http://localhost:5173", // Vite frontend development server
-  process.env.FRONTEND_URL, // Production frontend URL
-].filter(Boolean);
+  process.env.FRONTEND_URL?.trim(), // Production frontend URL from .env
+].filter(Boolean); // Remove undefined or empty values
 
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman or server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
+    // Allow requests with no origin (e.g., Postman, curl, server-to-server)
+    if (!origin) {
+      console.log("[DEBUG] No origin present in request — allowing (Postman, server-to-server)");
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      console.log(`[DEBUG] CORS allowed for origin: ${origin}`);
+      return callback(null, true);
     } else {
-      // Reject requests from disallowed origins
-      callback(new Error("Not allowed by CORS"));
+      console.warn(`[DEBUG] CORS rejected for origin: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // Enable cookies and credentials to be sent
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers in requests
+  credentials: true, // Enable cookies and credentials
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 export const setupCORS = (app) => {
   console.log("[DEBUG] Adding CORS middleware");
   app.use(cors(corsOptions));
   console.log("[DEBUG] CORS middleware added");
-}; 
+};

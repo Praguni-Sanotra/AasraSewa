@@ -22,10 +22,14 @@ import Payment from "./Pages/Payment";
 import Accommodation from "./Pages/Accommodation";
 import Transport from "./Pages/Transport";
 import ProtectedRoute from "./auth/ProtectedRoutes.jsx";
+import FaceVerificationPage from "./Pages/FaceVerificationPage"; // ✅ New import
 
 const Layout = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/signup" || location.pathname === "/login";
+  const isAuthPage =
+    location.pathname === "/signup" ||
+    location.pathname === "/login" ||
+    location.pathname === "/face-verification"; // ✅ Hide Header/Footer on face-verification page
 
   return (
     <div className="app-wrapper">
@@ -46,8 +50,14 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/filter" element={<ProtectedRoute><Filter /></ProtectedRoute>} />
-          
+          <Route
+            path="/filter"
+            element={
+              <ProtectedRoute>
+                <Filter />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/host"
             element={
@@ -96,6 +106,10 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
+
+          {/* ✅ New Face Verification Route (Unprotected) */}
+          <Route path="/face-verification" element={<FaceVerificationPage />} />
+
           {/* Redirect from old route */}
           <Route path="/explore" element={<Navigate to="/home" replace />} />
 
