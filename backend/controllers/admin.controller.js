@@ -171,7 +171,7 @@ export const submitAdminReview = async (req, res) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    property.review = {
+    property.adminReview = {
       rating,
       comment: comment || "",
       reviewedAt: new Date(),
@@ -182,7 +182,7 @@ export const submitAdminReview = async (req, res) => {
 
     res.status(200).json({
       message: "Admin review submitted successfully",
-      review: property.review,
+      review: property.adminReview,
       success: true,
     });
   } catch (error) {
