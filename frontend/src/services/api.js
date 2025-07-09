@@ -188,6 +188,63 @@ class ApiService {
       };
     }
   }
+
+  // Payment Methods
+  async createPaymentIntent(propertyId, amount) {
+    try {
+      const response = await api.post("/api/v1/payment/create-intent", {
+        propertyId,
+        amount,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to create payment intent",
+      };
+    }
+  }
+
+  async confirmPayment(paymentId, paymentMethod) {
+    try {
+      const response = await api.post("/api/v1/payment/confirm", {
+        paymentId,
+        paymentMethod,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to confirm payment",
+      };
+    }
+  }
+
+  async getPaymentStatus(paymentId) {
+    try {
+      const response = await api.get(`/api/v1/payment/status/${paymentId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to get payment status",
+      };
+    }
+  }
+
+  async getPaymentHistory(page = 1, limit = 10) {
+    try {
+      const response = await api.get("/api/v1/payment/history", {
+        params: { page, limit },
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to get payment history",
+      };
+    }
+  }
 }
 
 export default new ApiService();

@@ -79,14 +79,19 @@ const PropertyDetails = () => {
   }
 
   const handleRentClick = () => {
-    if (property.pricePerNight === 0) {
-      alert("Proceeding to accommodate in the shelter...");
-      setTimeout(() => {
-        navigate("/accommodation", { state: { property } });
-      }, 1000);
-    } else {
-      navigate(`/payment/${property._id}`);
-    }
+    // Console log the property address
+    console.log("Property Address:", property.fullAddress);
+    console.log("Property Location:", property.landmark);
+    console.log("Property Details:", {
+      title: property.title,
+      address: property.fullAddress,
+      location: property.landmark,
+      pincode: property.pincode,
+      price: property.pricePerNight
+    });
+    
+    // Navigate to payment page
+    navigate(`/payment/${property._id}`);
   };
 
   const handleTransportClick = () => {

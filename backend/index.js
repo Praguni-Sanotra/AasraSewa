@@ -7,6 +7,7 @@ import propertyRoutes from "./routes/property.route.js";
 import reportRoute from "./routes/report.js";
 import faceVerifyRoutes from "./routes/faceVerify.js";
 import adminRoutes from "./routes/admin.route.js";
+import paymentRoutes from "./routes/payment.route.js";
 import { setupSecurity, authLimiter } from "./middlewares/security.js";
 import { setupCORS } from "./middlewares/cors.js";
 import { setupErrorHandlers } from "./middlewares/errorHandlers.js";
@@ -34,6 +35,7 @@ app.use("/api/v1/property", propertyRoutes);
 app.use("/api/v1/report", reportRoute);
 app.use("/api/face", faceVerifyRoutes); // ✅ This is the face verification route
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/payment", paymentRoutes);
 console.log("[DEBUG] Routes registered");
 
 setupErrorHandlers(app);

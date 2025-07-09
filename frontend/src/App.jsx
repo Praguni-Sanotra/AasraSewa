@@ -19,6 +19,7 @@ import Host from "./Pages/Host";
 import Filter from "./Pages/Filter";
 import PropertyDetails from "./Pages/PropertyDetails";
 import Payment from "./Pages/Payment";
+import PaymentHistory from "./Pages/PaymentHistory";
 import Accommodation from "./Pages/Accommodation";
 import Transport from "./Pages/Transport";
 import ProtectedRoute from "./auth/ProtectedRoutes.jsx";
@@ -87,6 +88,14 @@ const Layout = () => {
             element={
               <ProtectedRoute>
                 <Payment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-history"
+            element={
+              <ProtectedRoute>
+                <PaymentHistory />
               </ProtectedRoute>
             }
           />
