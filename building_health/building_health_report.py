@@ -4,22 +4,20 @@ from ultralytics import YOLO
 from PIL import Image
 from fpdf import FPDF
 from dotenv import load_dotenv
-import openai
 import urllib.request
 import cloudinary.uploader
 import cloudinary.api
 import cloudinary
+from pymongo import MongoClient
+from bson import ObjectId
 
 # Load environment variables
 load_dotenv()
 
-# Logging
+# Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# OpenAI API Key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Cloudinary config (explicit)
+# Cloudinary configuration
 cloudinary.config(
     cloud_name="dfdfmx8mo",
     api_key="627233848483887",
@@ -27,19 +25,26 @@ cloudinary.config(
     secure=True
 )
 
+# MongoDB setup
+MONGO_URI = os.getenv("MONGO_URI")
+client = MongoClient(MONGO_URI)
+db = client["aasrasewa"]
+properties_collection = db["properties"]
+
 # Paths
 YOLO_MODEL_PATH = os.path.join(os.getcwd(), "best.pt")
 OUTPUT_DIR = "output_reports"
 PROCESSED_DIR = os.path.join(OUTPUT_DIR, "processed")
 PDF_DIR = os.path.join(OUTPUT_DIR, "pdfs")
-
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(PDF_DIR, exist_ok=True)
+
 
 def download_image(image_url, save_path):
     urllib.request.urlretrieve(image_url, save_path)
     logging.info(f"📥 Downloaded image to {save_path}")
     return save_path
+
 
 def detect_cracks(image_path):
     model = YOLO(YOLO_MODEL_PATH)
@@ -49,7 +54,7 @@ def detect_cracks(image_path):
     confidences = []
 
     for box in results[0].boxes:
-        if int(box.cls[0]) == 0:  # Assuming class 0 = crack
+        if int(box.cls[0]) == 0:
             crack_count += 1
             confidences.append(float(box.conf[0]))
 
@@ -60,6 +65,7 @@ def detect_cracks(image_path):
     logging.info(f"🔍 {os.path.basename(image_path)} → {crack_count} cracks detected")
 
     return processed_path, crack_count, confidences
+
 
 def generate_analysis(image_scores, avg_score):
     analysis = "AI-Based Structural Crack Analysis:\n"
@@ -79,6 +85,7 @@ def generate_analysis(image_scores, avg_score):
 
     analysis += f"\nSeverity Level: {severity}\nRecommendation: {recommendation}"
     return analysis
+
 
 def generate_pdf_report(image_data, property_id, analysis):
     pdf = FPDF()
@@ -109,6 +116,7 @@ def generate_pdf_report(image_data, property_id, analysis):
     logging.info(f"📄 PDF saved at {pdf_path}")
     return pdf_path
 
+
 def upload_pdf_to_cloudinary(pdf_path):
     try:
         result = cloudinary.uploader.upload(pdf_path, resource_type="raw")
@@ -118,6 +126,22 @@ def upload_pdf_to_cloudinary(pdf_path):
     except Exception as e:
         logging.error(f"❌ Cloudinary upload failed: {e}")
         return None
+
+
+def update_property_pdf(property_id, pdf_url):
+    try:
+        object_id = ObjectId(property_id)
+        result = properties_collection.update_one(
+            {"_id": object_id},
+            {"$set": {"healthReportPDF": pdf_url}}
+        )
+        if result.matched_count > 0:
+            logging.info(f"✅ PDF URL updated in MongoDB for property {property_id}")
+        else:
+            logging.warning(f"⚠️ No property found with ID {property_id}")
+    except Exception as e:
+        logging.error(f"❌ Failed to update MongoDB: {e}")
+
 
 def generate_building_health_report(image_urls_dict, property_id):
     if not (4 <= len(image_urls_dict) <= 6):
@@ -146,5 +170,12 @@ def generate_building_health_report(image_urls_dict, property_id):
 
     pdf_path = generate_pdf_report(local_image_paths, property_id, analysis)
     cloud_url = upload_pdf_to_cloudinary(pdf_path)
+
+    if cloud_url:
+        try:
+            pure_id = property_id.split("_")[0]
+            update_property_pdf(pure_id, cloud_url)
+        except Exception as e:
+            logging.error(f"❌ Failed to extract ObjectId or update DB: {e}")
 
     return cloud_url
