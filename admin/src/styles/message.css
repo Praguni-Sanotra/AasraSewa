@@ -1,25 +1,28 @@
+/* Main Section */
 .messages-section {
   min-height: 100vh;
   padding: 3rem 1.5rem;
   background: linear-gradient(145deg, #eef4ff, #ffffff);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
+  width: 100%;
 }
 
+/* Box Container */
 .messages-box {
   background: #ffffff;
   padding: 2.5rem;
   border-radius: 20px;
-  max-width: 800px;
+  max-width: 900px;
   width: 100%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
   text-align: center;
-  overflow-clip-margin: 5px ;
 }
 
+/* Title */
 .dashboard-title {
   font-size: 2.4rem;
   font-weight: 700;
@@ -27,6 +30,7 @@
   margin-bottom: 0.5rem;
 }
 
+/* Subtitle */
 .dashboard-subtitle {
   font-size: 1.1rem;
   color: #5f6a7d;
@@ -34,6 +38,7 @@
   margin-bottom: 2rem;
 }
 
+/* Message List */
 .message-list {
   display: flex;
   flex-direction: column;
@@ -41,6 +46,7 @@
   margin-top: 1rem;
 }
 
+/* Message Card */
 .message-card {
   background: #f8faff;
   border: 1px solid #dbe8f9;
@@ -55,6 +61,7 @@
   transform: translateY(-4px);
 }
 
+/* Header inside each card */
 .message-header {
   display: flex;
   justify-content: space-between;
@@ -62,12 +69,14 @@
   margin-bottom: 0.75rem;
 }
 
+/* Sender name */
 .message-sender {
   font-weight: 600;
   font-size: 1.1rem;
   color: #2c3e50;
 }
 
+/* Role Badges */
 .message-role {
   font-size: 0.9rem;
   font-weight: 600;
@@ -86,19 +95,21 @@
   color: #ef6c00;
 }
 
+/* Message content */
 .message-content {
   font-size: 1rem;
   color: #374151;
   margin-bottom: 0.5rem;
 }
 
+/* Timestamp */
 .message-time {
   font-size: 0.875rem;
   color: #6b7280;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
   .messages-box {
     padding: 1.5rem;
   }
@@ -113,5 +124,17 @@
 
   .message-sender {
     font-size: 1rem;
+  }
+
+  .message-card {
+    padding: 1.2rem;
+  }
+
+  .message-role {
+    font-size: 0.8rem;
+  }
+
+  .message-time {
+    font-size: 0.8rem;
   }
 }

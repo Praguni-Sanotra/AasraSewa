@@ -1,4 +1,4 @@
-// ✅ src/pages/Login.jsx
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import {
   Container,
@@ -17,6 +17,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../styles/Login.css';
+import logo from '../assets/logo.jpg'; // ✅ import the logo
 
 const AdminLogin = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -30,7 +31,8 @@ const AdminLogin = ({ onLogin }) => {
   const handleLogin = (e) => {
     e.preventDefault();
     if (email === 'admin@aasrasewa.com' && password === 'admin123') {
-      onLogin();
+      localStorage.setItem('isLoggedIn', 'true'); // ✅ persist login
+      onLogin(); // notify App
     } else {
       setError('Invalid credentials. Please try again.');
     }
@@ -39,6 +41,9 @@ const AdminLogin = ({ onLogin }) => {
   return (
     <Container maxWidth="sm" className="admin-container">
       <Box className="admin-box">
+        {/* ✅ Logo */}
+        <img src={logo} alt="AasraSewa Logo" className="admin-logo" />
+
         <Typography variant={isMobile ? 'h5' : 'h4'} className="admin-title">
           AasraSewa Admin Login
         </Typography>
