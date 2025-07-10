@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 import "../Styles/LoginPage.css";
-import logo from "../assets/logo.png"; // ✅ Import logo
+import logo from "../assets/logo.png";
+import { FiEye, FiEyeOff } from "react-icons/fi"; // Eye icons
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const LoginPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -26,14 +28,14 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields");
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const result = await login({
         email: formData.email,
@@ -41,13 +43,12 @@ const LoginPage = () => {
       });
 
       if (result.success) {
-        // Store credentials in localStorage if rememberMe is checked
         if (formData.rememberMe) {
           localStorage.setItem("rememberedEmail", formData.email);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
-        
+
         navigate("/home");
       } else {
         setError(result.error || "Login failed");
@@ -63,7 +64,6 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        {/* ✅ Logo at top */}
         <div className="image-container">
           <img src={logo} alt="Logo" className="login-logo" />
         </div>
@@ -84,18 +84,26 @@ const LoginPage = () => {
             required
             disabled={loading}
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="login-input"
-            required
-            disabled={loading}
-          />
 
-          {/* ✅ Remember me */}
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="login-input"
+              required
+              disabled={loading}
+            />
+            <span
+              className="eye-icon"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <FiEyeOff /> : <FiEye />}
+            </span>
+          </div>
+
           <label className="remember-label">
             <input
               type="checkbox"
@@ -108,8 +116,8 @@ const LoginPage = () => {
             Remember Me
           </label>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-button"
             disabled={loading}
           >

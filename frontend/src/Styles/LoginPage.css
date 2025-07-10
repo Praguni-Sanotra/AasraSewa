@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff; /* ✅ Removed gradient */
+  background: #ffffff;
   font-family: 'Segoe UI', sans-serif;
   padding: 2rem;
 }
@@ -44,6 +44,8 @@ form {
   font-size: 1rem;
   background-color: #f9fafb;
   transition: all 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .login-input:focus {
@@ -51,6 +53,27 @@ form {
   border-color: #3b82f6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
   background-color: #fff;
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper .login-input {
+  padding-right: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #555;
+  font-size: 1.25rem;
 }
 
 .login-button {
