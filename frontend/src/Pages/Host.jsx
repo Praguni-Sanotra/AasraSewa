@@ -160,43 +160,51 @@ export default function HostPage() {
         images[wall] = result.url;
       });
 
-      // 1. Call building health backend for analysis
-      const propertyId = `${user?.id || "guest"}_${Date.now()}`; // unique property id
+      // 1. First, call building health analysis to get the PDF URL
       const analyzeResponse = await fetch("http://localhost:5001/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           images, // { frontWall: url, backWall: url, ... }
-          propertyId,
+          propertyId: "temp_" + Date.now(), // Temporary ID for analysis
         }),
       });
-      const analyzeResult = await analyzeResponse.json();
-      if (!analyzeResponse.ok) {
-        setError(analyzeResult.message || "Building health analysis failed");
-        setLoading(false);
-        return;
+      
+      let healthReportPDF = null;
+      if (analyzeResponse.ok) {
+        const analyzeResult = await analyzeResponse.json();
+        healthReportPDF = analyzeResult.pdf_url;
+        console.log("✅ Building health analysis completed successfully");
+        console.log("📄 PDF URL:", healthReportPDF);
+      } else {
+        const analyzeResult = await analyzeResponse.json();
+        console.warn("⚠️ Building health analysis failed:", analyzeResult.message);
+        // Continue without health report - property will be saved without PDF
       }
 
-      // 2. Save the property with propertyId (so you can fetch the PDF later)
+      // 2. Now save the property with all data including the PDF URL
       const propertyData = {
         ...formData,
         images,
         propertyImage: propertyImageUrl,
-        propertyId, // save this!
+        healthReportPDF, // Include the PDF URL if analysis was successful
       };
+      
       const result = await apiService.registerProperty(propertyData);
 
-      if (result.success) {
-        // Property registered successfully
-        navigate("/home", {
-          state: {
-            message:
-              "Property registered successfully! It will be reviewed by admin.",
-          },
-        });
-      } else {
+      if (!result.success) {
         setError(result.error || "Failed to register property");
+        setLoading(false);
+        return;
       }
+
+      // Property registered successfully
+      navigate("/home", {
+        state: {
+          message:
+            "Property registered successfully! It will be reviewed by admin.",
+        },
+      });
     } catch (error) {
       setError("An unexpected error occurred");
       console.error("Property registration error:", error);

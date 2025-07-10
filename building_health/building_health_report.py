@@ -10,6 +10,11 @@ import cloudinary.api
 import cloudinary
 from pymongo import MongoClient
 from bson import ObjectId
+import sys
+import time
+
+# Import configuration
+from config import *
 
 # Load environment variables
 load_dotenv()
@@ -19,23 +24,18 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 # Cloudinary configuration
 cloudinary.config(
-    cloud_name="dfdfmx8mo",
-    api_key="627233848483887",
-    api_secret="QJ9xBrqzhxqgpC3gtwAywNxOrCc",
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET,
     secure=True
 )
 
-# MongoDB setup
-MONGO_URI = os.getenv("MONGO_URI")
+# MongoDB setup - Use the same connection string as the Node.js backend
 client = MongoClient(MONGO_URI)
-db = client["aasrasewa"]
-properties_collection = db["properties"]
+db = client[DATABASE_NAME]
+properties_collection = db[COLLECTION_NAME]
 
-# Paths
-YOLO_MODEL_PATH = os.path.join(os.getcwd(), "best.pt")
-OUTPUT_DIR = "output_reports"
-PROCESSED_DIR = os.path.join(OUTPUT_DIR, "processed")
-PDF_DIR = os.path.join(OUTPUT_DIR, "pdfs")
+# Create directories if they don't exist
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(PDF_DIR, exist_ok=True)
 
@@ -113,13 +113,36 @@ def generate_pdf_report(image_data, property_id, analysis):
 
     pdf_path = os.path.join(PDF_DIR, f"{property_id}_health_report.pdf")
     pdf.output(pdf_path)
-    logging.info(f"📄 PDF saved at {pdf_path}")
+
+    # Wait for file to be fully written and check size
+    last_size = -1
+    for _ in range(10):
+        if os.path.exists(pdf_path):
+            size = os.path.getsize(pdf_path)
+            print(f"[DEBUG] PDF exists: {pdf_path}, size: {size} bytes")
+            if size == last_size and size > 0:
+                break
+            last_size = size
+        time.sleep(0.1)
+    else:
+        print(f"[ERROR] PDF file not ready or is empty: {pdf_path}")
+
+    logging.info(f"📄 PDF saved at {pdf_path} (size: {os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 'N/A'} bytes)")
     return pdf_path
 
 
 def upload_pdf_to_cloudinary(pdf_path):
     try:
-        result = cloudinary.uploader.upload(pdf_path, resource_type="raw")
+        # Extra check before upload
+        if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
+            logging.error(f"❌ PDF file does not exist or is empty: {pdf_path}")
+            return None
+        print(f"[DEBUG] Uploading PDF: {pdf_path}, size: {os.path.getsize(pdf_path)} bytes")
+        result = cloudinary.uploader.upload(
+            pdf_path,
+            resource_type="raw",
+            type="upload"  # Force public upload
+        )
         cloud_url = result.get("secure_url")
         logging.info(f"☁️ Uploaded PDF to Cloudinary: {cloud_url}")
         return cloud_url
@@ -130,17 +153,38 @@ def upload_pdf_to_cloudinary(pdf_path):
 
 def update_property_pdf(property_id, pdf_url):
     try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(property_id):
+            logging.error(f"❌ Invalid ObjectId format: {property_id}")
+            return False
+            
         object_id = ObjectId(property_id)
+        
+        # First, check if the property exists
+        property_exists = properties_collection.find_one({"_id": object_id})
+        if not property_exists:
+            logging.error(f"❌ Property with ID {property_id} not found in database")
+            return False
+        
+        # Update the property with the PDF URL
         result = properties_collection.update_one(
             {"_id": object_id},
             {"$set": {"healthReportPDF": pdf_url}}
         )
-        if result.matched_count > 0:
-            logging.info(f"✅ PDF URL updated in MongoDB for property {property_id}")
+        
+        if result.matched_count > 0 and result.modified_count > 0:
+            logging.info(f"✅ PDF URL successfully updated in MongoDB for property {property_id}")
+            return True
+        elif result.matched_count > 0:
+            logging.warning(f"⚠️ Property found but no changes made for ID {property_id}")
+            return False
         else:
-            logging.warning(f"⚠️ No property found with ID {property_id}")
+            logging.error(f"❌ No property found with ID {property_id}")
+            return False
+            
     except Exception as e:
         logging.error(f"❌ Failed to update MongoDB: {e}")
+        return False
 
 
 def generate_building_health_report(image_urls_dict, property_id):
@@ -172,10 +216,43 @@ def generate_building_health_report(image_urls_dict, property_id):
     cloud_url = upload_pdf_to_cloudinary(pdf_path)
 
     if cloud_url:
-        try:
-            pure_id = property_id.split("_")[0]
-            update_property_pdf(pure_id, cloud_url)
-        except Exception as e:
-            logging.error(f"❌ Failed to extract ObjectId or update DB: {e}")
+        logging.info(f"✅ Successfully generated health report PDF: {cloud_url}")
+        
+        # Only try to update database if it's a real property ID (not temporary)
+        if not property_id.startswith("temp_"):
+            success = update_property_pdf(property_id, cloud_url)
+            if success:
+                logging.info(f"✅ Successfully stored PDF URL for property {property_id}")
+            else:
+                logging.error(f"❌ Failed to store PDF URL for property {property_id}")
+        else:
+            logging.info(f"📝 Using temporary ID {property_id} - PDF URL will be saved with property")
+    else:
+        logging.error("❌ Failed to upload PDF to Cloudinary")
 
     return cloud_url
+
+
+# Main execution for command line usage
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python building_health_report.py <image_json> <property_id>")
+        sys.exit(1)
+    
+    try:
+        import json
+        image_json = sys.argv[1]
+        property_id = sys.argv[2]
+        
+        image_urls_dict = json.loads(image_json)
+        result = generate_building_health_report(image_urls_dict, property_id)
+        
+        if result:
+            print(f"✅ Health report generated successfully: {result}")
+        else:
+            print("❌ Failed to generate health report")
+            sys.exit(1)
+            
+    except Exception as e:
+        logging.error(f"❌ Error in main execution: {e}")
+        sys.exit(1)

@@ -1,12 +1,5 @@
 import Property from "../models/property.model.js";
 import mongoose from "mongoose";
-import { spawn } from "child_process";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // ========================
 // Register New Property
@@ -23,6 +16,7 @@ export const registerProperty = async (req, res) => {
       capacity,
       images,
       propertyImage,
+      healthReportPDF, // Add this field
     } = req.body;
 
     const createdBy = req.id;
@@ -57,27 +51,10 @@ export const registerProperty = async (req, res) => {
       createdBy,
       images,
       propertyImage,
+      healthReportPDF, // Include the PDF URL if provided
     });
 
     const savedProperty = await newProperty.save();
-
-    // === 🔁 Trigger Python Script ===
-    const scriptPath = path.join(
-      __dirname,
-      "../../building_health/building_health_report.py"
-    );
-    const imageJson = JSON.stringify(savedProperty.images);
-    const propertyId = savedProperty._id.toString();
-
-    const pythonProcess = spawn("python3", [scriptPath, imageJson, propertyId]);
-
-    pythonProcess.stdout.on("data", (data) => {
-      console.log(`📥 PYTHON STDOUT: ${data}`);
-    });
-
-    pythonProcess.stderr.on("data", (data) => {
-      console.error(`❌ PYTHON ERROR: ${data}`);
-    });
 
     res.status(201).json({
       message: "Property registered successfully.",
