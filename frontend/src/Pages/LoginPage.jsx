@@ -68,7 +68,7 @@ const LoginPage = () => {
           <img src={logo} alt="Logo" className="login-logo" />
         </div>
 
-        <h2>Welcome Back!</h2>
+        <h2>Welcome </h2>
         <p>Please login to continue</p>
 
         {error && <div className="error-message">{error}</div>}
