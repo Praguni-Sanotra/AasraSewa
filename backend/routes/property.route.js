@@ -7,11 +7,13 @@ import {
   registerProperty,
   updateMyProperty,
   getPropertyById,
+  getApprovedProperties,
 } from "../controllers/property.controller.js";
 const router = express.Router();
 
 router.get("/all", isAuthenticated, getAllPropertiesWithOptionalFilters);
 router.get("/my", isAuthenticated, getMyProperties);
+router.get("/approved", isAuthenticated, getApprovedProperties);
 router.get("/:id", isAuthenticated, getPropertyById);
 router.post("/register", isAuthenticated, registerProperty);
 router.put("/update/:id", isAuthenticated, updateMyProperty);

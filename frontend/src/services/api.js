@@ -135,6 +135,18 @@ class ApiService {
     }
   }
 
+  async getApprovedProperties(params = {}) {
+    try {
+      const response = await api.get("/api/v1/property/approved", { params });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to get approved properties",
+      };
+    }
+  }
+
   async getPropertyById(id) {
     try {
       const response = await api.get(`/api/v1/property/${id}`);

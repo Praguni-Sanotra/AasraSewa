@@ -53,7 +53,7 @@ const Filter = () => {
         params[key] === undefined && delete params[key]
       );
 
-      const result = await apiService.getAllProperties(params);
+      const result = await apiService.getApprovedProperties(params);
       
       if (result.success) {
         setProperties(result.data.properties);

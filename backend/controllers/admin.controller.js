@@ -71,6 +71,14 @@ export const updatePropertyStatus = async (req, res) => {
     property.status = action;
     await property.save();
 
+    // Update isHost status for the user if property is approved or unapproved
+    if (action === "approved" || action === "rejected" || action === "pending") {
+      const userId = property.createdBy;
+      // Count approved properties for this user
+      const approvedCount = await Property.countDocuments({ createdBy: userId, status: "approved" });
+      await User.findByIdAndUpdate(userId, { isHost: approvedCount > 0 });
+    }
+
     res.status(200).json({
       message: `Property ${action} successfully`,
       property,

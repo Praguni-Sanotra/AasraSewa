@@ -5,7 +5,7 @@ const propertySchema = new mongoose.Schema(
     landmark: { type: String, required: true, trim: true },
     pincode: { type: String, required: true, trim: true },
     fullAddress: { type: String, required: true, trim: true },
-    pricePerNight: { type: Number, required: true, min: 0 },
+    pricePerNight: { type: Number, required: true, min: 0, max: 5000 },
     description: { type: String, required: true, maxlength: 500, trim: true },
     capacity: { type: Number, required: true, min: 1 },
     createdBy: {

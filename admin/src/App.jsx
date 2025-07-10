@@ -1,163 +1,134 @@
 // ✅ src/App.jsx
-import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, Outlet } from 'react-router-dom';
 import './App.css';
 
-import Login from './pages/Login';
-import HostVerification from './pages/HostVerification';
-import ActiveHosts from './pages/activehost';
-import Messages from './pages/message';
-import ActiveUsers from './pages/activeuser';
-import HostPDFViewer from './pages/HostPDFViewer';
-import HostDetails from './pages/HostDetails';
+import Login from './pages/Login.jsx';
+import ActiveUser from './pages/activeuser.jsx';
+import ActiveHost from './pages/activehost.jsx';
+import HostVerification from './pages/HostVerification.jsx';
+import HostDetails from './pages/HostDetails.jsx';
+import HostPDFViewer from './pages/HostPDFViewer.jsx';
+import Message from './pages/message.jsx';
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [active, setActive] = useState('host-verification');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+// Auth context
+const AuthContext = createContext();
+export const useAuth = () => useContext(AuthContext);
 
-  useEffect(() => {
-    const loggedInStatus = localStorage.getItem('isLoggedIn');
-    if (loggedInStatus === 'true') {
-      setIsLoggedIn(true);
-    }
-  }, []);
+function AuthProvider({ children }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('isLoggedIn'));
 
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    localStorage.setItem('isLoggedIn', 'true');
-    navigate('/dashboard');
-  };
-
-  const handleLogout = () => {
+  const login = () => setIsLoggedIn(true);
+  const logout = () => {
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
-    navigate('/login');
-  };
-
-  const handleNavClick = (section) => {
-    setActive(section);
-    setSidebarOpen(false);
-  };
-
-  const DashboardLayout = () => {
-    return (
-      <div className="dashboard-layout">
-        {/* Mobile Header */}
-        <header className="mobile-header">
-          <button
-            className="hamburger"
-            aria-label="Toggle sidebar"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-          <span className="mobile-title">
-            <span className="logo-dot" /> Admin
-          </span>
-        </header>
-
-        {/* Sidebar */}
-        <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
-          <div className="sidebar-header">
-            <h2>
-              <span className="logo-dot" /> Admin
-            </h2>
-          </div>
-          <nav>
-            <ul>
-              <li
-                className={active === 'host-verification' ? 'active' : ''}
-                onClick={() => handleNavClick('host-verification')}
-              >
-                <span className="icon">🛡️</span> Host Verification
-              </li>
-              <li
-                className={active === 'active-hosts' ? 'active' : ''}
-                onClick={() => handleNavClick('active-hosts')}
-              >
-                <span className="icon">🏠</span> Active Hosts
-              </li>
-              <li
-                className={active === 'messages' ? 'active' : ''}
-                onClick={() => handleNavClick('messages')}
-              >
-                <span className="icon">💬</span> Messages
-              </li>
-              <li
-                className={active === 'active-users' ? 'active' : ''}
-                onClick={() => handleNavClick('active-users')}
-              >
-                <span className="icon">🧑‍💻</span> Active Users
-              </li>
-              <li onClick={handleLogout}>
-                <span className="icon">🚪</span> Logout
-              </li>
-            </ul>
-          </nav>
-        </aside>
-
-        {/* Main Content Area */}
-        <main
-          className="main-content"
-          onClick={() => sidebarOpen && setSidebarOpen(false)}
-        >
-          {renderMainContent()}
-        </main>
-
-        {/* Sidebar Backdrop */}
-        {sidebarOpen && (
-          <div
-            className="sidebar-backdrop"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </div>
-    );
-  };
-
-  const renderMainContent = () => {
-    switch (active) {
-      case 'host-verification':
-        return <HostVerification />;
-      case 'active-hosts':
-        return <ActiveHosts />;
-      case 'messages':
-        return <Messages />;
-      case 'active-users':
-        return <ActiveUsers />;
-      default:
-        return <div>Page not found</div>;
-    }
   };
 
   return (
+    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// Protected route component
+function ProtectedRoute({ children }) {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? children : <Navigate to="/login" replace />;
+}
+
+// Dashboard layout with sidebar
+function DashboardLayout() {
+  const { logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (
+    <div className="dashboard-layout">
+      {/* Mobile Header */}
+      <header className="mobile-header">
+        <button
+          className="hamburger"
+          aria-label="Toggle sidebar"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <span className="mobile-title">
+          <span className="logo-dot" /> Admin
+        </span>
+        <button onClick={logout} className="logout-btn">Logout</button>
+      </header>
+      {/* Sidebar */}
+      <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div className="sidebar-header">
+          <h2>
+            <span className="logo-dot" /> Admin
+          </h2>
+        </div>
+        <nav>
+          <ul>
+            <li>
+              <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''} end>
+                <span className="icon">🛡️</span> Host Verification
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/activehost" className={({ isActive }) => isActive ? 'active' : ''}>
+                <span className="icon">🏠</span> Active Hosts
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/activeuser" className={({ isActive }) => isActive ? 'active' : ''}>
+                <span className="icon">🧑‍💻</span> Active Users
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/message" className={({ isActive }) => isActive ? 'active' : ''}>
+                <span className="icon">💬</span> Messages
+              </NavLink>
+            </li>
+            <li>
+              <button onClick={logout} className="sidebar-logout">🚪 Logout</button>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+      {/* Main Content Area */}
+      <main className="main-content" onClick={() => sidebarOpen && setSidebarOpen(false)}>
+        <Outlet />
+      </main>
+      {/* Sidebar Backdrop */}
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const { isLoggedIn } = useAuth();
+  return (
     <Routes>
-      <Route
-        path="/login"
-        element={<Login onLogin={handleLoginSuccess} />}
-      />
-      <Route
-        path="/dashboard"
-        element={isLoggedIn ? <DashboardLayout /> : <Login onLogin={handleLoginSuccess} />}
-      />
-      <Route
-        path="/host/:id/verify"
-        element={isLoggedIn ? <HostPDFViewer /> : <Login onLogin={handleLoginSuccess} />}
-      />
-      <Route
-        path="/host/:id/details"
-        element={isLoggedIn ? <HostDetails /> : <Login onLogin={handleLoginSuccess} />}
-      />
-      <Route
-        path="*"
-        element={<Login onLogin={handleLoginSuccess} />}
-      />
+      <Route path="/login" element={<Login onLogin={() => window.location.href = '/dashboard'} />} />
+      <Route element={isLoggedIn ? <DashboardLayout /> : <></>}>
+        <Route path="/dashboard" element={<ProtectedRoute><HostVerification /></ProtectedRoute>} />
+        <Route path="/activehost" element={<ProtectedRoute><ActiveHost /></ProtectedRoute>} />
+        <Route path="/activeuser" element={<ProtectedRoute><ActiveUser /></ProtectedRoute>} />
+        <Route path="/host-verification" element={<ProtectedRoute><HostVerification /></ProtectedRoute>} />
+        <Route path="/host-details/:id" element={<ProtectedRoute><HostDetails /></ProtectedRoute>} />
+        <Route path="/host-pdf/:id" element={<ProtectedRoute><HostPDFViewer /></ProtectedRoute>} />
+        <Route path="/message" element={<ProtectedRoute><Message /></ProtectedRoute>} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Route>
     </Routes>
   );
 }
 
-export default App;
+export default function RootApp() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}

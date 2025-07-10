@@ -62,6 +62,13 @@ export const registerProperty = async (req, res) => {
     });
   } catch (error) {
     console.error("Error registering property:", error);
+    if (error.name === 'ValidationError') {
+      // Custom message for pricePerNight max validation
+      if (error.errors && error.errors.pricePerNight && error.errors.pricePerNight.kind === 'max') {
+        return res.status(400).json({ message: "Price per night cannot exceed ₹5000." });
+      }
+      return res.status(400).json({ message: error.message });
+    }
     res
       .status(500)
       .json({ message: "Server error while registering property." });
@@ -235,5 +242,50 @@ export const getPropertyById = async (req, res) => {
   } catch (error) {
     console.error("Error getting property:", error);
     res.status(500).json({ message: "Server error while getting property." });
+  }
+};
+
+// ========================
+// Get All Approved Properties
+// ========================
+export const getApprovedProperties = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      minCost,
+      maxCost,
+      members,
+      sort = "asc",
+    } = req.query;
+
+    const filters = { status: "approved" };
+
+    if (minCost || maxCost) {
+      filters.pricePerNight = {};
+      if (minCost) filters.pricePerNight.$gte = Number(minCost);
+      if (maxCost) filters.pricePerNight.$lte = Number(maxCost);
+    }
+    if (members) {
+      filters.capacity = { $gte: Number(members) };
+    }
+
+    const sortOption = sort === "desc" ? -1 : 1;
+
+    const total = await Property.countDocuments(filters);
+    const properties = await Property.find(filters)
+      .sort({ pricePerNight: sortOption })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    res.status(200).json({
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+      properties,
+    });
+  } catch (error) {
+    console.error("Error in getApprovedProperties:", error);
+    res.status(500).json({ message: "Server error while fetching approved properties." });
   }
 };
