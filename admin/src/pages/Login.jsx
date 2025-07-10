@@ -18,7 +18,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../styles/Login.css';
 import logo from '../assets/logo.jpg'; // ✅ import the logo
-import axios from 'axios';
 
 const AdminLogin = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -29,19 +28,13 @@ const AdminLogin = ({ onLogin }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    setError("");
-    try {
-      const response = await axios.post("/api/v1/admin/login", { email, password }, { withCredentials: true });
-      if (response.data.success) {
-        localStorage.setItem('isLoggedIn', 'true');
-        onLogin();
-      } else {
-        setError(response.data.message || 'Login failed.');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Server error. Please try again.');
+    if (email === 'admin@aasrasewa.com' && password === 'admin123') {
+      localStorage.setItem('isLoggedIn', 'true'); // ✅ persist login
+      onLogin(); // notify App
+    } else {
+      setError('Invalid credentials. Please try again.');
     }
   };
 
