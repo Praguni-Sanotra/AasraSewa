@@ -30,15 +30,12 @@ const Filter = () => {
   const [onlyFree, setOnlyFree] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
-  // Pagination states
-  const [limit] = useState(10);
+  // Pagination state
+  const [limit] = useState(5); // ✅ Reduced from 10 to 5
 
-  // Fetch properties from API
   const fetchProperties = async (page = 1) => {
     try {
       setLoading(true);
-      
-      // Build query parameters
       const params = {
         page,
         limit,
@@ -46,15 +43,15 @@ const Filter = () => {
         maxCost: filters.maxCost ? parseInt(filters.maxCost) : undefined,
         minCost: filters.minCost ? parseInt(filters.minCost) : undefined,
         sort: sortBy || undefined,
+        onlyFree: onlyFree ? true : undefined,
       };
 
-      // Remove undefined values
-      Object.keys(params).forEach(key => 
-        params[key] === undefined && delete params[key]
-      );
+      Object.keys(params).forEach((key) => {
+        if (params[key] === undefined) delete params[key];
+      });
 
       const result = await apiService.getApprovedProperties(params);
-      
+
       if (result.success) {
         setProperties(result.data.properties);
         setTotalPages(result.data.totalPages);
@@ -71,19 +68,16 @@ const Filter = () => {
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchProperties();
   }, []);
 
-  // Apply filters
   const handleApplyFilters = () => {
     setCurrentPage(1);
     fetchProperties(1);
     setShowFilters(false);
   };
 
-  // Handle pagination
   const handlePageChange = (page) => {
     fetchProperties(page);
   };
@@ -92,11 +86,10 @@ const Filter = () => {
     navigate(`/property/${id}`);
   };
 
-  // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -106,25 +99,25 @@ const Filter = () => {
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -142,7 +135,7 @@ const Filter = () => {
   return (
     <div className="results">
       <h2>Filter and View Properties</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
 
       <div className="filter-container">
@@ -181,14 +174,14 @@ const Filter = () => {
                 onChange={(e) => setFilters({ ...filters, minCost: e.target.value })}
               />
 
-            <label>
-              <input
-                type="checkbox"
-                checked={onlyFree}
-                onChange={(e) => setOnlyFree(e.target.checked)}
-              />
-              Show only Free of Cost Houses
-            </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={onlyFree}
+                  onChange={(e) => setOnlyFree(e.target.checked)}
+                />
+                Show only Free of Cost Houses
+              </label>
 
               <label>Sort by Cost:</label>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -204,7 +197,6 @@ const Filter = () => {
         </div>
       </div>
 
-      {/* Results Summary */}
       <div className="results-summary">
         <p>Showing {properties.length} of {totalProperties} properties</p>
       </div>
@@ -218,9 +210,9 @@ const Filter = () => {
               onClick={() => handleCardClick(prop._id)}
               style={{ cursor: "pointer" }}
             >
-              <img 
-                src={prop.propertyImage || "https://placehold.co/250x150?text=Property"} 
-                alt={prop.title} 
+              <img
+                src={prop.propertyImage || "https://placehold.co/250x150?text=Property"}
+                alt={prop.title}
               />
               <h3>{prop.title}</h3>
               <p><strong>📍 Landmark:</strong> {prop.landmark}</p>
@@ -237,29 +229,28 @@ const Filter = () => {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="pagination">
-          <button 
+          <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="pagination-btn"
           >
             Previous
           </button>
-          
+
           {getPageNumbers().map((page, index) => (
             <button
               key={index}
-              onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
-              disabled={page === '...'}
-              className={`pagination-btn ${page === currentPage ? 'active' : ''} ${page === '...' ? 'disabled' : ''}`}
+              onClick={() => typeof page === "number" ? handlePageChange(page) : null}
+              disabled={page === "..."}
+              className={`pagination-btn ${page === currentPage ? "active" : ""} ${page === "..." ? "disabled" : ""}`}
             >
               {page}
             </button>
           ))}
-          
-          <button 
+
+          <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className="pagination-btn"

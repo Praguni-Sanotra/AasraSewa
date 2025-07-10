@@ -182,7 +182,7 @@
   color: #333;
 }
 
-.pagination {
+.pagination-payment {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -273,7 +273,7 @@
     height: 120px;
   }
   
-  .pagination {
+  .pagination-payment {
     flex-direction: column;
     gap: 10px;
   }

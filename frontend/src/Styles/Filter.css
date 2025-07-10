@@ -489,6 +489,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .pagination {
+    flex-direction: row;
     gap: 5px;
   }
   
