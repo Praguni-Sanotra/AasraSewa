@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthTest from "../Components/AuthTest.jsx";
+import TopRatedShelters from "../Components/TopRatedShelters.jsx";
 import "./../Styles/Home.css";
 
 const Home = () => {
@@ -16,27 +17,6 @@ const Home = () => {
   const handleEmergency = () => {
     navigate("/emergency");
   };
-
-  const properties = [
-    {
-      img: "https://placehold.co/250x150?text=Property+1",
-      title: "Shelter 1",
-      location: "Mumbai, India",
-      rating: "★★★★☆ (4.5)",
-    },
-    {
-      img: "https://placehold.co/250x150?text=Property+2",
-      title: "Shelter 2",
-      location: "Delhi, India",
-      rating: "★★★☆☆ (3.8)",
-    },
-    {
-      img: "https://placehold.co/250x150?text=Property+3",
-      title: "Shelter 3",
-      location: "Bangalore, India",
-      rating: "★★★★★ (4.9)",
-    },
-  ];
 
   const generateGoogleMapURL = () => {
     if (!mapLocation) return "https://www.google.com/maps/embed?pb=!1m18...";
@@ -72,18 +52,8 @@ const Home = () => {
             </div>
           </div>
 
-          <h3 className="home-properties-title">Our Top Rated Shelters</h3>
-
-          <div className="home-properties-grid">
-            {properties.map((prop, index) => (
-              <div key={index} className="home-property-card">
-                <img src={prop.img} alt={prop.title} />
-                <h4>{prop.title}</h4>
-                <p>Location: {prop.location}</p>
-                <p>Rating: {prop.rating}</p>
-              </div>
-            ))}
-          </div>
+          {/* Replace dummy data with real TopRatedShelters component */}
+          <TopRatedShelters />
         </div>
       </section>
     </div>

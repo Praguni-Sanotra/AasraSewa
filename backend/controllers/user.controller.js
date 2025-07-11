@@ -27,6 +27,7 @@ export const register = async (req, res) => {
       address,
       aadhaarImage,
       gender,
+      face,
     } = req.body;
 
     // Individual field checks for better UX
@@ -66,6 +67,10 @@ export const register = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Gender is required", success: false });
+    if (!face)
+      return res
+        .status(400)
+        .json({ message: "Face image is required", success: false });
 
     if (!isValidEmail(email)) {
       return res
@@ -123,6 +128,7 @@ export const register = async (req, res) => {
       address,
       aadhaarImage,
       gender,
+      face,
     });
 
     return res.status(201).json({

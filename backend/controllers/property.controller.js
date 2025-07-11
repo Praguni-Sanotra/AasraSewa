@@ -87,6 +87,7 @@ export const getAllPropertiesWithOptionalFilters = async (req, res) => {
       maxCost,
       members,
       sort = "asc",
+      status, // <-- allow status filter
     } = req.query;
 
     const filters = {};
@@ -107,11 +108,17 @@ export const getAllPropertiesWithOptionalFilters = async (req, res) => {
       }
     }
 
+    // Allow admin to filter by status (pending/approved)
+    if (status) {
+      filters.status = status;
+    }
+
     const sortOption = sort === "desc" ? -1 : 1;
 
     const total = await Property.countDocuments(filters);
 
     const properties = await Property.find(filters)
+      .populate("createdBy", "fullName email phone age address gender")
       .sort({ pricePerNight: sortOption })
       .skip((page - 1) * limit)
       .limit(Number(limit));
@@ -287,5 +294,37 @@ export const getApprovedProperties = async (req, res) => {
   } catch (error) {
     console.error("Error in getApprovedProperties:", error);
     res.status(500).json({ message: "Server error while fetching approved properties." });
+  }
+};
+
+export const getTopRatedProperties = async (req, res) => {
+  try {
+    console.log('Backend: Getting top rated properties');
+    
+    const properties = await Property.find({ 
+      status: "approved",
+      "adminReview.rating": { $exists: true, $ne: null }
+    })
+    .populate('createdBy', 'name email')
+    .sort({ "adminReview.rating": -1 })
+    .limit(3);
+    
+    console.log('Backend: Found properties:', properties.length);
+    console.log('Backend: Properties with ratings:', properties.map(p => ({
+      id: p._id,
+      rating: p.adminReview?.rating,
+      comment: p.adminReview?.comment
+    })));
+
+    res.status(200).json({
+      success: true,
+      properties: properties,
+    });
+  } catch (error) {
+    console.error('Backend: Error getting top rated properties:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching top rated properties",
+    });
   }
 };

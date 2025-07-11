@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import axios from 'axios';
 
@@ -7,12 +8,26 @@ const FaceVerify = () => {
   const [storedImage, setStoredImage] = useState(null);
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRegistration, setIsRegistration] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [aadhaarImage, setAadhaarImage] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const videoConstraints = {
     width: 350,
     height: 350,
     facingMode: 'user',
   };
+
+  // Check if this is registration flow
+  useEffect(() => {
+    if (location.state?.userData) {
+      setIsRegistration(true);
+      setUserData(location.state.userData);
+      setAadhaarImage(location.state.aadhaarImage);
+    }
+  }, [location.state]);
 
   // Base64 to Blob converter
   const base64toBlob = (dataURL) => {
@@ -35,7 +50,71 @@ const FaceVerify = () => {
     }
   };
 
-  // Verify captured face
+  // Upload face image to Cloudinary and register user
+  const uploadFaceAndRegister = async () => {
+    if (!storedImage) {
+      alert('Please capture your face image first.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Upload face image to Cloudinary
+      const faceBlob = base64toBlob(storedImage);
+      const formData = new FormData();
+      formData.append('face', faceBlob, 'face.png');
+
+      const API_URL = import.meta.env.VITE_API_URL;
+      const faceResponse = await axios.post(`${API_URL}/api/face/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!faceResponse.data.success) {
+        throw new Error(faceResponse.data.error || 'Failed to upload face image');
+      }
+
+      const faceUrl = faceResponse.data.faceUrl;
+
+      // Upload Aadhaar image to Cloudinary
+      const aadhaarFormData = new FormData();
+      aadhaarFormData.append('file', aadhaarImage);
+      aadhaarFormData.append('upload_preset', 'aasrasewa');
+
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      const aadhaarResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        aadhaarFormData
+      );
+
+      const aadhaarUrl = aadhaarResponse.data.secure_url;
+
+      // Register user with all data including face and aadhaar URLs
+      const registrationData = {
+        ...userData,
+        aadhaarImage: aadhaarUrl,
+        face: faceUrl,
+      };
+
+      const registerResponse = await axios.post(`${API_URL}/api/v1/user/register`, registrationData);
+
+      if (registerResponse.data.success) {
+        alert('Registration successful! Please login.');
+        navigate('/login');
+      } else {
+        throw new Error(registerResponse.data.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error("❌ Registration Error:", error);
+      setResult(`⚠️ Registration failed: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify captured face (existing functionality)
   const verifyFace = async () => {
     if (!storedImage) {
       alert('Please capture the reference face first.');
@@ -92,7 +171,12 @@ const FaceVerify = () => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>Face Verification</h2>
+      <h2>{isRegistration ? 'Face Registration' : 'Face Verification'}</h2>
+      {isRegistration && (
+        <p style={{ color: '#666', marginBottom: '20px' }}>
+          Please capture a clear photo of your face for registration
+        </p>
+      )}
       <Webcam
         audio={false}
         height={350}
@@ -104,13 +188,19 @@ const FaceVerify = () => {
       />
       <div style={{ marginTop: '10px' }}>
         <button onClick={captureStoredFace} disabled={loading}>
-          📸 Capture Reference
+          📸 {isRegistration ? 'Capture Face' : 'Capture Reference'}
         </button>
-        <button onClick={verifyFace} disabled={loading} style={{ marginLeft: '10px' }}>
-          🔍 Verify Face
-        </button>
+        {isRegistration ? (
+          <button onClick={uploadFaceAndRegister} disabled={loading} style={{ marginLeft: '10px' }}>
+            🚀 Complete Registration
+          </button>
+        ) : (
+          <button onClick={verifyFace} disabled={loading} style={{ marginLeft: '10px' }}>
+            🔍 Verify Face
+          </button>
+        )}
       </div>
-      {loading && <p>Verifying...</p>}
+      {loading && <p>{isRegistration ? 'Registering...' : 'Verifying...'}</p>}
       {result && (
         <p style={{ marginTop: '10px' }}>
           <strong>{result}</strong>
@@ -118,7 +208,7 @@ const FaceVerify = () => {
       )}
       {storedImage && (
         <div style={{ marginTop: '20px' }}>
-          <p>Reference Face:</p>
+          <p>{isRegistration ? 'Your Face:' : 'Reference Face:'}</p>
           <img src={storedImage} alt="Stored" width={150} />
         </div>
       )}

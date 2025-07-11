@@ -50,7 +50,14 @@ export const adminLogin = async (req, res) => {
 export const updatePropertyStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { action } = req.query; // approve / reject / unverify
+    console.log('Backend: Property ID:', id);
+    console.log('Backend: Request method:', req.method);
+    console.log('Backend: Request body:', req.body);
+    console.log('Backend: Request query:', req.query);
+    
+    // Handle both query parameters and request body
+    const { action, rating, comment } = req.method === 'PATCH' ? req.body : req.query;
+    console.log('Backend: Extracted data - action:', action, 'rating:', rating, 'comment:', comment);
 
     if (!mongoose.Types.ObjectId.isValid(id))
       return res
@@ -68,8 +75,44 @@ export const updatePropertyStatus = async (req, res) => {
         .status(400)
         .json({ message: "Invalid action", success: false });
 
+    // For approval, require rating and comment
+    if (action === "approved") {
+      console.log('Backend: Processing approval with rating:', rating, 'comment:', comment);
+      if (!rating || !comment) {
+        console.log('Backend: Missing rating or comment');
+        return res
+          .status(400)
+          .json({ 
+            message: "Rating and comment are required when approving a property", 
+            success: false 
+          });
+      }
+
+      const ratingNum = Number(rating);
+      if (ratingNum < 1 || ratingNum > 5) {
+        console.log('Backend: Invalid rating:', ratingNum);
+        return res
+          .status(400)
+          .json({ 
+            message: "Rating must be between 1 and 5", 
+            success: false 
+          });
+      }
+
+      property.adminReview = {
+        rating: ratingNum,
+        comment: comment,
+        reviewedAt: new Date(),
+        reviewedBy: req.adminId,
+      };
+      console.log('Backend: Set admin review:', property.adminReview);
+    }
+
     property.status = action;
+    console.log('Backend: Setting property status to:', action);
+
     await property.save();
+    console.log('Backend: Property saved successfully');
 
     // Update isHost status for the user if property is approved or unapproved
     if (action === "approved" || action === "rejected" || action === "pending") {
@@ -77,6 +120,7 @@ export const updatePropertyStatus = async (req, res) => {
       // Count approved properties for this user
       const approvedCount = await Property.countDocuments({ createdBy: userId, status: "approved" });
       await User.findByIdAndUpdate(userId, { isHost: approvedCount > 0 });
+      console.log('Backend: Updated user host status');
     }
 
     res.status(200).json({
@@ -85,15 +129,22 @@ export const updatePropertyStatus = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.error("Error updating status:", error);
+    console.error("Backend: Error updating status:", error);
     return res.status(500).json({ message: "Server error", success: false });
   }
 };
 
 export const getAllProperties = async (req, res) => {
   try {
-    const properties = await Property.find()
-      .populate("createdBy", "fullName email phone address gender")
+    const { status } = req.query;
+    
+    const filters = {};
+    if (status && ["pending", "approved", "rejected"].includes(status)) {
+      filters.status = status;
+    }
+
+    const properties = await Property.find(filters)
+      .populate("createdBy", "fullName email phone address gender age")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({ properties, success: true });
@@ -113,7 +164,7 @@ export const getPropertyByIdAdmin = async (req, res) => {
         .json({ message: "Invalid property ID", success: false });
 
     const property = await Property.findById(id)
-      .populate("createdBy", "fullName email phone address gender")
+      .populate("createdBy", "fullName email phone address gender age")
       .select("-__v");
 
     if (!property)
@@ -214,6 +265,79 @@ export const adminRegister = async (req, res) => {
     return res.status(201).json({ message: "Admin registered successfully", success: true });
   } catch (error) {
     console.error("Admin registration error:", error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "-password");
+    return res.status(200).json({ users, success: true });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const getAllHosts = async (req, res) => {
+  try {
+    const hosts = await User.find({ isHost: true }, "-password");
+    return res.status(200).json({ hosts, success: true });
+  } catch (error) {
+    console.error("Error fetching hosts:", error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const deleteProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res
+        .status(400)
+        .json({ message: "Invalid property ID", success: false });
+
+    const property = await Property.findById(id);
+    if (!property)
+      return res
+        .status(404)
+        .json({ message: "Property not found", success: false });
+
+    // Delete the property
+    await Property.findByIdAndDelete(id);
+
+    // Update isHost status for the user if this was their only approved property
+    const userId = property.createdBy;
+    const approvedCount = await Property.countDocuments({ createdBy: userId, status: "approved" });
+    await User.findByIdAndUpdate(userId, { isHost: approvedCount > 0 });
+
+    res.status(200).json({
+      message: "Property deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error deleting property:", error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const getTopRatedProperties = async (req, res) => {
+  try {
+    const topProperties = await Property.find({ 
+      status: "approved",
+      "adminReview.rating": { $exists: true, $ne: null }
+    })
+    .populate("createdBy", "fullName email phone address gender age")
+    .sort({ "adminReview.rating": -1, createdAt: -1 })
+    .limit(3);
+
+    return res.status(200).json({ 
+      properties: topProperties, 
+      success: true 
+    });
+  } catch (error) {
+    console.error("Error fetching top rated properties:", error);
     return res.status(500).json({ message: "Server error", success: false });
   }
 };

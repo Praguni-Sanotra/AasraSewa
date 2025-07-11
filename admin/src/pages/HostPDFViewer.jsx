@@ -1,31 +1,38 @@
 // src/pages/HostPDFViewer.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/HostVerification.css';
 
-const dummyHosts = [
-  {
-    id: 1,
-    name: 'Amit Sharma',
-    email: 'amitsharma@gmail.com',
-    pdf: '/sample-property-report.pdf', // path to the PDF
-  },
-  {
-    id: 2,
-    name: 'Ritika Verma',
-    email: 'ritikaverma@yahoo.com',
-    pdf: '/sample-property-report.pdf',
-  },
-];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const HostPDFViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState('Pending');
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const host = dummyHosts.find((h) => h.id === parseInt(id));
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/v1/admin/property/${id}`, { credentials: 'include' });
+        const data = await res.json();
+        if (data && data.property) {
+          setProperty(data.property);
+        }
+      } catch (err) {
+        setProperty(null);
+      }
+      setLoading(false);
+    };
+    fetchProperty();
+  }, [id]);
 
-  if (!host) return <p>Host not found</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!property) return <p>Property not found</p>;
+
+  const host = property.createdBy || {};
+  const pdfUrl = property.healthReportPDF || '/sample-property-report.pdf';
 
   const handleToggleVerification = () => {
     if (status === 'Verified') {
@@ -40,17 +47,16 @@ const HostPDFViewer = () => {
   return (
     <section className="host-verification-section">
       <h1 className="dashboard-title">Verify Host</h1>
-      <p className="dashboard-subtitle">Verifying: {host.name} ({host.email})</p>
+      <p className="dashboard-subtitle">Verifying: {host.fullName || 'N/A'} ({host.email || 'N/A'})</p>
 
       <div className="pdf-container">
         <iframe
           className="pdf-viewer"
-          src={host.pdf}
+          src={pdfUrl}
           title="Host Document"
           loading="lazy"
         >
-          Your browser does not support iframes.{" "}
-          <a href={host.pdf} target="_blank" rel="noopener noreferrer">Click here</a> to view.
+          Your browser does not support iframes. <a href={pdfUrl} target="_blank" rel="noopener noreferrer">Click here</a> to view.
         </iframe>
       </div>
 

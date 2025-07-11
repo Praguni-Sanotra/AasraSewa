@@ -2,53 +2,37 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/activeuser.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+console.log('API_BASE_URL (activeuser):', API_BASE_URL);
+
 const ActiveUser = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Placeholder for backend fetch
     const fetchUsers = async () => {
-      const dummyUsers = [
-        {
-          id: 1,
-          name: 'Amit Sharma',
-          location: 'Delhi, India',
-          email: 'amitsharma@gmail.com',
-          status: 'Active',
-        },
-        {
-          id: 2,
-          name: 'Ritika Verma',
-          location: 'Mumbai, India',
-          email: 'ritikaverma@yahoo.com',
-          status: 'Active',
-        },
-        {
-          id: 3,
-          name: 'Rajeev Ranjan',
-          location: 'Bangalore, India',
-          email: 'rajeev.ranjan@gmail.com',
-          status: 'Active',
-        },
-        {
-          id: 4,
-          name: 'Meena Iyer',
-          location: 'Chennai, India',
-          email: 'meenaiyer@gmail.com',
-          status: 'Active',
-        },
-        {
-          id: 5,
-          name: 'Saurav Patel',
-          location: 'Ahmedabad, India',
-          email: 'sauravpatel@gmail.com',
-          status: 'Active',
-        },
-      ];
-
-      setUsers(dummyUsers);
+      const url = `${API_BASE_URL}/v1/admin/users`;
+      console.log('Fetching users from:', url);
+      try {
+        const res = await fetch(url, { credentials: 'include' });
+        console.log('Response status:', res.status);
+        const data = await res.json();
+        console.log('Fetched users data:', data);
+        if (data && data.users) {
+          // Map backend data to UI structure
+          const mapped = data.users.map((user) => ({
+            id: user._id,
+            name: user.fullName || 'N/A',
+            location: user.address || 'N/A',
+            email: user.email || 'N/A',
+            status: 'Active',
+          }));
+          setUsers(mapped);
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        setUsers([]);
+      }
     };
-
     fetchUsers();
   }, []);
 

@@ -19,6 +19,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import '../styles/Login.css';
 import logo from '../assets/logo.jpg'; // ✅ import the logo
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AdminLogin = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,13 +30,24 @@ const AdminLogin = ({ onLogin }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === 'admin@aasrasewa.com' && password === 'admin123') {
-      localStorage.setItem('isLoggedIn', 'true'); // ✅ persist login
-      onLogin(); // notify App
-    } else {
-      setError('Invalid credentials. Please try again.');
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        onLogin(); // notify App
+      } else {
+        setError(data.message || 'Invalid credentials. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
     }
   };
 

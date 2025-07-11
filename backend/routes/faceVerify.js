@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -6,7 +8,7 @@ import { Canvas, Image, ImageData, loadImage } from "canvas";
 import * as faceapi from "face-api.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-
+import cloudinary from "../config/cloudinary.js";
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
@@ -38,6 +40,81 @@ await loadModels(); // Load on import
 // ✅ Health Check Route
 router.get("/ping", (req, res) => {
   res.json({ message: "pong" });
+});
+
+// ✅ Upload Face Image Route
+router.post("/upload", upload.single("face"), async (req, res) => {
+  console.log("📩 /api/face/upload endpoint hit");
+
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "Face image is required." });
+    }
+
+    console.log("📂 Face image received:", file.originalname);
+    console.log("📂 File path:", file.path);
+    console.log("📂 File size:", file.size);
+
+    // Load image to verify it's a valid face
+    let image;
+    try {
+      image = await loadImage(file.path);
+      console.log("✅ Image loaded successfully");
+    } catch (err) {
+      console.error("❌ Error loading image:", err);
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: "Invalid image format." });
+    }
+
+    // Detect face in the image
+    const face = await faceapi
+      .detectSingleFace(image)
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+    if (!face || !face.descriptor) {
+      console.log("❌ No face detected in image");
+      fs.unlinkSync(file.path);
+      return res.status(400).json({
+        error: "No face detected in the image. Please upload a clear face photo.",
+      });
+    }
+
+    console.log("✅ Face detected successfully");
+
+    // Upload to Cloudinary
+    console.log("📤 Starting Cloudinary upload...");
+    console.log("📤 Cloudinary config check:");
+    console.log("📤 cloud_name:", process.env.CLOUDINARY_CLOUD_NAME);
+    console.log("📤 api_key exists:", !!process.env.CLOUDINARY_API_KEY);
+    console.log("📤 api_secret exists:", !!process.env.CLOUDINARY_API_SECRET);
+
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "faces",
+      resource_type: "image",
+    });
+
+    console.log("✅ Cloudinary upload successful:", result.secure_url);
+
+    // Clean up local file
+    fs.unlinkSync(file.path);
+
+    return res.status(200).json({
+      success: true,
+      faceUrl: result.secure_url,
+      message: "Face image uploaded successfully.",
+    });
+  } catch (err) {
+    console.error("❌ Face upload error:", err);
+    console.error("❌ Error stack:", err.stack);
+    console.error("❌ Error message:", err.message);
+    // Clean up file if it exists
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: "Internal server error." });
+  }
 });
 
 // ✅ Face Verification Route
