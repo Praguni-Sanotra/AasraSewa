@@ -8,10 +8,12 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 
+// Component Imports
 import Header from "./Components/Header";
 import HeroSection from "./Components/HeroSection";
 import Footer from "./Components/Footer";
 
+// Page Imports
 import Signup from "./Pages/Signup";
 import LoginPage from "./Pages/LoginPage";
 import Home from "./Pages/Home";
@@ -22,15 +24,17 @@ import Payment from "./Pages/Payment";
 import PaymentHistory from "./Pages/PaymentHistory";
 import Accommodation from "./Pages/Accommodation";
 import Transport from "./Pages/Transport";
+import FaceVerificationPage from "./Pages/FaceVerificationPage";
+import EmergencyPage from "./Pages/Emergency"; // ✅ NEW IMPORT
+
 import ProtectedRoute from "./auth/ProtectedRoutes.jsx";
-import FaceVerificationPage from "./Pages/FaceVerificationPage"; // ✅ New import
 
 const Layout = () => {
   const location = useLocation();
   const isAuthPage =
     location.pathname === "/signup" ||
     location.pathname === "/login" ||
-    location.pathname === "/face-verification"; // ✅ Hide Header/Footer on face-verification page
+    location.pathname === "/face-verification";
 
   return (
     <div className="app-wrapper">
@@ -116,7 +120,17 @@ const Layout = () => {
             }
           />
 
-          {/* ✅ New Face Verification Route (Unprotected) */}
+          {/* ✅ Emergency Page Route (Protected) */}
+          <Route
+            path="/emergency"
+            element={
+              <ProtectedRoute>
+                <EmergencyPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ Face Verification Route (Public) */}
           <Route path="/face-verification" element={<FaceVerificationPage />} />
 
           {/* Redirect from old route */}

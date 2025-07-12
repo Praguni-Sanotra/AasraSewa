@@ -186,39 +186,37 @@ form {
   transition: transform 0.3s ease;
 }
 
-/* Remove Button */
+/* ✅ Minimal Remove Button (Just an "X") */
 .signup-remove-aadhaar-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: #ef4444;
-  color: white;
+  background: transparent;
+  color: #ef4444;
   border: none;
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
+  font-size: 1.5rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.2s ease, color 0.2s ease;
+  z-index: 2;
 }
 
 .signup-remove-aadhaar-btn:hover {
-  background: #dc2626;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #b91c1c;
+  transform: scale(1.2);
 }
 
 .signup-remove-aadhaar-btn:disabled {
-  background: #9ca3af;
+  color: #9ca3af;
   cursor: not-allowed;
   transform: none;
 }
 
 .signup-remove-aadhaar-btn-icon {
-  font-size: 1.5rem;
-  position: relative;
-  right: 14px;
-  bottom: 10px;
+  font-size: inherit;
+  line-height: 1;
 }
 
 /* Submit Button */
