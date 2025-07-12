@@ -112,7 +112,7 @@
 @media (max-width: 992px) {
   .active-hosts-box {
     padding: 1.8rem;
-    margin: 0 1rem;
+    margin: 0 0rem;
   }
 
   .dashboard-title {
