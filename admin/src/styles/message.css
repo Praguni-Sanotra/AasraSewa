@@ -5,7 +5,7 @@
   background: linear-gradient(145deg, #eef4ff, #ffffff);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center; /* Center the box vertically */
   box-sizing: border-box;
   width: 100%;
 }
@@ -20,6 +20,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
 /* Title */
@@ -110,6 +111,10 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .messages-section {
+    align-items: flex-start; /* Back to top alignment for mobile scroll UX */
+  }
+
   .messages-box {
     padding: 1.5rem;
   }
