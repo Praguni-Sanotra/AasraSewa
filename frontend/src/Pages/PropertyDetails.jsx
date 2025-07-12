@@ -79,7 +79,6 @@ const PropertyDetails = () => {
   }
 
   const handleRentClick = () => {
-    // Console log the property address
     console.log("Property Address:", property.fullAddress);
     console.log("Property Location:", property.landmark);
     console.log("Property Details:", {
@@ -89,8 +88,6 @@ const PropertyDetails = () => {
       pincode: property.pincode,
       price: property.pricePerNight
     });
-    
-    // Navigate to payment page
     navigate(`/payment/${property._id}`);
   };
 
@@ -98,7 +95,6 @@ const PropertyDetails = () => {
     navigate("/transport");
   };
 
-  // Get all images for pagination
   const allImages = [
     property.propertyImage,
     property.images?.frontWall,
@@ -127,7 +123,6 @@ const PropertyDetails = () => {
     <div className="property-details">
       <div className="spacer"></div>
       <div className="property-card">
-        {/* Image Gallery with Pagination */}
         <div className="property-image-gallery">
           <div className="main-image-container">
             <img 
@@ -135,8 +130,6 @@ const PropertyDetails = () => {
               alt={`${property.title} - Image ${currentImageIndex + 1}`} 
               className="property-img" 
             />
-            
-            {/* Navigation arrows */}
             {allImages.length > 1 && (
               <>
                 <button 
@@ -157,7 +150,6 @@ const PropertyDetails = () => {
             )}
           </div>
 
-          {/* Thumbnail pagination */}
           {allImages.length > 1 && (
             <div className="image-thumbnails">
               {allImages.map((image, index) => (
@@ -172,7 +164,6 @@ const PropertyDetails = () => {
             </div>
           )}
 
-          {/* Image counter */}
           {allImages.length > 1 && (
             <div className="image-counter">
               {currentImageIndex + 1} / {allImages.length}
@@ -183,25 +174,25 @@ const PropertyDetails = () => {
         <div className="property-info">
           <h2>{property.title}</h2>
           <p><MapPin style={{ marginRight: "6px" }} /> <strong>Location:</strong> {property.location || property.landmark}</p>
-<p><Home style={{ marginRight: "6px" }} /> <strong>Address:</strong> {property.fullAddress}</p>
-<p><Mail style={{ marginRight: "6px" }} /> <strong>Pincode:</strong> {property.pincode}</p>
-<p><Users style={{ marginRight: "6px" }} /> <strong>Capacity:</strong> {property.capacity} people</p>
-<p><IndianRupee style={{ marginRight: "6px" }} /> <strong>Price per Night:</strong> ₹{property.pricePerNight === 0 ? "Free" : property.pricePerNight}</p>
-<p><Info style={{ marginRight: "6px" }} /> <strong>Description:</strong> {property.description}</p>
-<p><Ruler style={{ marginRight: "6px" }} /> <strong>Distance:</strong> {property.distance}</p>
-<p><Mail style={{ marginRight: "6px" }} /> <strong>Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
-<p><Phone style={{ marginRight: "6px" }} /> <strong>Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
-<p><CheckCircle style={{ marginRight: "6px" }} /> <strong>Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
-<p><Star style={{ marginRight: "6px" }} /> <strong>Rating:</strong> {property.star}/5</p>
+          <p><Home style={{ marginRight: "6px" }} /> <strong>Address:</strong> {property.fullAddress}</p>
+          <p><Mail style={{ marginRight: "6px" }} /> <strong>Pincode:</strong> {property.pincode}</p>
+          <p><Users style={{ marginRight: "6px" }} /> <strong>Capacity:</strong> {property.capacity} people</p>
+          <p><IndianRupee style={{ marginRight: "6px" }} /> <strong>Price per Night:</strong> ₹{property.pricePerNight === 0 ? "Free" : property.pricePerNight}</p>
+          <p className="description"><Info style={{ marginRight: "6px" }} /> <strong>Description:</strong> {property.description}</p>
+          <p><Ruler style={{ marginRight: "6px" }} /> <strong>Distance:</strong> {property.distance}</p>
+          <p><Mail style={{ marginRight: "6px" }} /> <strong>Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
+          <p><Phone style={{ marginRight: "6px" }} /> <strong>Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
+          <p><CheckCircle style={{ marginRight: "6px" }} /> <strong>Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
+          <p><Star style={{ marginRight: "6px" }} /> <strong>Rating:</strong> {property.star}/5</p>
 
-{property.createdBy && (
-  <div className="host-info">
-    <h3><User style={{ marginRight: "6px" }} /> Host Information</h3>
-    <p><strong>Name:</strong> {property.createdBy.fullName}</p>
-    <p><strong>Email:</strong> {property.createdBy.email}</p>
-    <p><strong>Phone:</strong> {property.createdBy.phone}</p>
-  </div>
-)}
+          {property.createdBy && (
+            <div className="host-info">
+              <h3><User style={{ marginRight: "6px" }} /> Host Information</h3>
+              <p><strong>Name:</strong> {property.createdBy.fullName}</p>
+              <p><strong>Email:</strong> {property.createdBy.email}</p>
+              <p><strong>Phone:</strong> {property.createdBy.phone}</p>
+            </div>
+          )}
         </div>
       </div>
 
