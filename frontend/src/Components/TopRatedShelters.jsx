@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../Styles/TopRatedShelters.css';
 
 const TopRatedShelters = () => {
@@ -12,7 +13,7 @@ const TopRatedShelters = () => {
         // First test if backend is accessible
         const healthUrl = '/health';
         console.log('TopRatedShelters: Testing backend health at:', healthUrl);
-        
+
         try {
           const healthRes = await fetch(healthUrl);
           console.log('TopRatedShelters: Health check status:', healthRes.status);
@@ -23,10 +24,10 @@ const TopRatedShelters = () => {
         } catch (healthError) {
           console.error('TopRatedShelters: Backend health check failed:', healthError);
         }
-        
+
         const url = '/api/v1/property/top-rated';
         console.log('TopRatedShelters: API URL:', url);
-        
+
         const res = await fetch(url, {
           method: 'GET',
           headers: {
@@ -34,8 +35,7 @@ const TopRatedShelters = () => {
           },
         });
         console.log('TopRatedShelters: Response status:', res.status);
-        
-        // Check if response is JSON
+
         const contentType = res.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           console.error('TopRatedShelters: Response is not JSON, content-type:', contentType);
@@ -43,10 +43,10 @@ const TopRatedShelters = () => {
           console.error('TopRatedShelters: Response text:', text.substring(0, 200));
           throw new Error('Response is not JSON');
         }
-        
+
         const data = await res.json();
         console.log('TopRatedShelters: Response data:', data);
-        
+
         if (data.success && data.properties) {
           console.log('TopRatedShelters: Setting properties:', data.properties);
           setTopProperties(data.properties);
@@ -85,17 +85,21 @@ const TopRatedShelters = () => {
   return (
     <div className="top-rated-section">
       <h3 className="home-properties-title">Our Top Rated Shelters</h3>
-      
+
       <div className="home-properties-grid">
-        {topProperties.map((property, index) => {
-          const host = property.createdBy || {};
+        {topProperties.map((property) => {
           const rating = property.adminReview?.rating || 0;
           const ratingStars = "★".repeat(Math.floor(rating)) + "☆".repeat(5 - Math.floor(rating));
-          
+
           return (
-            <div key={property._id} className="home-property-card">
-              <img 
-                src={property.propertyImage || 'https://placehold.co/250x150?text=Property+Image'} 
+            <Link
+              key={property._id}
+              to={`/property/${property._id}`}
+              className="home-property-card"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <img
+                src={property.propertyImage || 'https://placehold.co/250x150?text=Property+Image'}
                 alt={property.title}
                 onError={(e) => {
                   e.target.src = 'https://placehold.co/250x150?text=Property+Image';
@@ -104,7 +108,7 @@ const TopRatedShelters = () => {
               <h4>{property.title}</h4>
               <p>Location: {property.landmark}, {property.pincode}</p>
               <p>Rating: {ratingStars} ({rating.toFixed(1)})</p>
-            </div>
+            </Link>
           );
         })}
       </div>
