@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../Styles/Emergency.css";
 import { IconButton, Tooltip } from "@mui/material";
 import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
@@ -11,9 +11,32 @@ import TrainIcon from "@mui/icons-material/Train";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 
 const EmergencyPage = () => {
+  const [location, setLocation] = useState({ lat: null, lng: null });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        error => {
+          console.error("Location access denied or unavailable.", error);
+        }
+      );
+    }
+  }, []);
+
   const handleCall = () => {
     window.location.href = "tel:100";
   };
+
+  const mapSrc =
+    location.lat && location.lng
+      ? `https://maps.google.com/maps?q=${location.lat},${location.lng}&z=17&output=embed`
+      : `https://maps.google.com/maps?q=Model%20Institute%20of%20Engineering&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="emergency-container">
@@ -21,15 +44,10 @@ const EmergencyPage = () => {
       <div className="map-section">
         <iframe
           title="map"
-          src="https://maps.google.com/maps?q=Model%20Institute%20of%20Engineering&t=&z=17&ie=UTF8&iwloc=&output=embed"
+          src={mapSrc}
           frameBorder="0"
           allowFullScreen
         ></iframe>
-
-        <div className="sos-message">
-          <span role="img" aria-label="edit">📝</span>
-          Add Message to Emergency SoS
-        </div>
       </div>
 
       {/* Action Buttons */}

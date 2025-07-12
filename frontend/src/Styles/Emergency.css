@@ -68,30 +68,6 @@
   border: none;
 }
 
-/* SOS Message */
-.sos-message {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffffff;
-  color: #b10000;
-  font-weight: 600;
-  padding: 12px 20px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: transform 0.3s ease, background-color 0.3s;
-  cursor: pointer;
-}
-
-.sos-message:hover {
-  transform: translateX(-50%) scale(1.03);
-  background-color: #fff0f0;
-}
-
 /* Action Buttons */
 .action-buttons {
   padding: 2rem 1rem;
