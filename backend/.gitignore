@@ -26,4 +26,4 @@ mocha.json
 # Other common ignored files
 .npm/
 .nyc_output/
-.temp/
+.temp/.env/
