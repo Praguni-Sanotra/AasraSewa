@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 train: Dummy-Retakan-1/train/images
 val: Dummy-Retakan-1/valid/images
 test: Dummy-Retakan-1/test/images
+=======
+train: /Users/pragunisanotra/Desktop/Prediction_Model/building_health/Dummy-Retakan-1/train/images
+val: /Users/pragunisanotra/Desktop/Prediction_Model/building_health/Dummy-Retakan-1/valid/images
+test: /Users/pragunisanotra/Desktop/Prediction_Model/building_health/Dummy-Retakan-1/test/images
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
 
 nc: 1
 names: ['Crack']

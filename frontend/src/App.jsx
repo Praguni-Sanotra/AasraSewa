@@ -7,7 +7,11 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext.jsx";
+<<<<<<< HEAD
 import { ToastContainer } from "react-toastify";
+=======
+
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
 // Component Imports
 import Header from "./Components/Header";
 import HeroSection from "./Components/HeroSection";

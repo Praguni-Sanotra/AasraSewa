@@ -4,7 +4,11 @@ from building_health_report import generate_building_health_report
 import logging
 
 app = Flask(__name__)
+<<<<<<< HEAD
 CORS(app, origins=["https://aasrasewa-frontend-vsxu.onrender.com"], supports_credentials=True)
+=======
+CORS(app)
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 @app.route("/", methods=["GET"])

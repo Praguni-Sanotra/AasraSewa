@@ -2,12 +2,18 @@ import cors from "cors";
 
 // Define allowed origins for CORS
 const allowedOrigins = [
+<<<<<<< HEAD
   'https://aasrasewa-frontend-vsxu.onrender.com',
   'https://admin-41w7.onrender.com',
   "http://localhost:5173", // Vite frontend development server
   "http://localhost:5174", // Admin frontend development server
   process.env.FRONTEND_URL?.trim(), // Production frontend URL from .env
   process.env.ADMIN_URL?.trim(), // Production ADMIN URL from .env
+=======
+  "http://localhost:5173", // Vite frontend development server
+  "http://localhost:5174", // Admin frontend development server
+  process.env.FRONTEND_URL?.trim(), // Production frontend URL from .env
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
 ].filter(Boolean); // Remove undefined or empty values
 
 // CORS configuration

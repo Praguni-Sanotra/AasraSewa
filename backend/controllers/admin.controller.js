@@ -35,9 +35,15 @@ export const adminLogin = async (req, res) => {
 
     res.cookie("adminToken", token, {
       httpOnly: true,
+<<<<<<< HEAD
       secure: true, // Always true for production (HTTPS)
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "None", // Required for cross-site cookies
+=======
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "strict",
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
     });
 
     return res.status(200).json({ message: "Login successful", success: true });

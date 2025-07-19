@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import apiService from "../services/api.js";
 
 const AuthContext = createContext({
-  isAuthenticated: false,
+  isAuthenticated: null,
   loading: true,
   user: null,
   login: () => {},

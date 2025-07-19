@@ -26,7 +26,11 @@ const TopRatedShelters = () => {
           console.error('TopRatedShelters: Backend health check failed:', healthError);
         }
 
+<<<<<<< HEAD
         const url = `${BACKEND_URL}/api/v1/property/top-rated`;
+=======
+        const url = '/api/v1/property/top-rated';
+>>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
         console.log('TopRatedShelters: API URL:', url);
 
         const res = await fetch(url, {
