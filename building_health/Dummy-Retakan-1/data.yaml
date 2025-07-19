@@ -1,0 +1,13 @@
+train: Dummy-Retakan-1/train/images
+val: Dummy-Retakan-1/valid/images
+test: Dummy-Retakan-1/test/images
+
+nc: 1
+names: ['Crack']
+
+roboflow:
+  workspace: buildinghealth
+  project: dummy-retakan-ijyvm
+  version: 1
+  license: Public Domain
+  url: https://universe.roboflow.com/buildinghealth/dummy-retakan-ijyvm/dataset/1
