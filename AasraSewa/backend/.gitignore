@@ -1,0 +1,53 @@
+# Node modules
+node_modules/
+
+# Python environments (if any scripts are run here)
+env/
+venv/
+ENV/
+.venv/
+__pycache__/
+*.pyc
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+coverage/
+output_reports/
+processed/
+processed_images/
+
+# Environment variables
+.env
+.env.*
+.envrc
+*.env
+
+# Editor and OS files
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Test and temp files
+junit.xml
+mocha.json
+.npm/
+.nyc_output/
+.temp/
+*.cache
