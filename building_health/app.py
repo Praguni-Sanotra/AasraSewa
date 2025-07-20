@@ -4,11 +4,9 @@ from building_health_report import generate_building_health_report
 import logging
 
 app = Flask(__name__)
-<<<<<<< HEAD
-CORS(app, origins=["https://aasrasewa-frontend-vsxu.onrender.com"], supports_credentials=True)
-=======
-CORS(app)
->>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
+# CORS(app, origins=["https://aasrasewa-frontend-vsxu.onrender.com"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5173", "https://your-production-site.com"], supports_credentials=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 @app.route("/", methods=["GET"])
@@ -28,15 +26,17 @@ def analyze():
         cloudinary_pdf_url = generate_building_health_report(images, property_id)
 
         if not cloudinary_pdf_url:
-            return jsonify({"message": "Cloudinary upload failed."}), 500
+            return jsonify({"message": "Cloudinary upload failed. Check backend logs for details."}), 500
 
         return jsonify({
             "message": "Analysis complete.",
             "pdf_url": cloudinary_pdf_url
         }), 200
     except Exception as e:
-        logging.error(f"❌ Error in /analyze: {e}")
-        return jsonify({"message": "Analysis failed"}), 500
+        import traceback
+        tb = traceback.format_exc()
+        logging.error(f"❌ Error in /analyze: {e}\n{tb}")
+        return jsonify({"message": f"Analysis failed: {str(e)}", "traceback": tb}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)

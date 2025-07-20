@@ -5,12 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
     "dev": "nodemon index.js",
     "start": "node index.js"
-=======
-    "dev": "nodemon index.js"
->>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
   },
   "keywords": [],
   "author": "",

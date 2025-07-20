@@ -199,6 +199,7 @@ export const updateMyProperty = async (req, res) => {
       "capacity",
       "images",
       "propertyImage",
+      "healthReportPDF", // <-- allow updating PDF
     ];
 
     allowedUpdates.forEach((field) => {

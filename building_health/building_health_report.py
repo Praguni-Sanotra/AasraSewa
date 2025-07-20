@@ -12,6 +12,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 import sys
 import time
+import traceback
 
 # Import configuration
 from config import *
@@ -148,6 +149,8 @@ def upload_pdf_to_cloudinary(pdf_path):
         return cloud_url
     except Exception as e:
         logging.error(f"❌ Cloudinary upload failed: {e}")
+        logging.error(f"Traceback:\n{traceback.format_exc()}")
+        logging.error(f"File info: path={pdf_path}, exists={os.path.exists(pdf_path)}, size={(os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 'N/A')}")
         return None
 
 

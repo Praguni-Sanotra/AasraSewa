@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../Styles/TopRatedShelters.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "../Styles/TopRatedShelters.css";
 
 const TopRatedShelters = () => {
   const [topProperties, setTopProperties] = useState([]);
@@ -8,58 +8,73 @@ const TopRatedShelters = () => {
 
   useEffect(() => {
     const fetchTopRatedProperties = async () => {
-      console.log('TopRatedShelters: Starting to fetch top rated properties');
+      console.log("TopRatedShelters: Starting to fetch top rated properties");
       try {
         // First test if backend is accessible
-        const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://aasrasewa-backend-bmkx.onrender.com';
+        const BACKEND_URL =
+          import.meta.env.VITE_API_URL ||
+          "https://aasrasewa-backend-bmkx.onrender.com";
         const healthUrl = `${BACKEND_URL}/health`;
-        console.log('TopRatedShelters: Testing backend health at:', healthUrl);
+        console.log("TopRatedShelters: Testing backend health at:", healthUrl);
 
         try {
           const healthRes = await fetch(healthUrl);
-          console.log('TopRatedShelters: Health check status:', healthRes.status);
+          console.log(
+            "TopRatedShelters: Health check status:",
+            healthRes.status
+          );
           if (healthRes.ok) {
             const healthData = await healthRes.json();
-            console.log('TopRatedShelters: Health check response:', healthData);
+            console.log("TopRatedShelters: Health check response:", healthData);
           }
         } catch (healthError) {
-          console.error('TopRatedShelters: Backend health check failed:', healthError);
+          console.error(
+            "TopRatedShelters: Backend health check failed:",
+            healthError
+          );
         }
 
-<<<<<<< HEAD
         const url = `${BACKEND_URL}/api/v1/property/top-rated`;
-=======
-        const url = '/api/v1/property/top-rated';
->>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
-        console.log('TopRatedShelters: API URL:', url);
+        console.log("TopRatedShelters: API URL:", url);
 
         const res = await fetch(url, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
-        console.log('TopRatedShelters: Response status:', res.status);
+        console.log("TopRatedShelters: Response status:", res.status);
 
-        const contentType = res.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          console.error('TopRatedShelters: Response is not JSON, content-type:', contentType);
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error(
+            "TopRatedShelters: Response is not JSON, content-type:",
+            contentType
+          );
           const text = await res.text();
-          console.error('TopRatedShelters: Response text:', text.substring(0, 200));
-          throw new Error('Response is not JSON');
+          console.error(
+            "TopRatedShelters: Response text:",
+            text.substring(0, 200)
+          );
+          throw new Error("Response is not JSON");
         }
 
         const data = await res.json();
-        console.log('TopRatedShelters: Response data:', data);
+        console.log("TopRatedShelters: Response data:", data);
 
         if (data.success && data.properties) {
-          console.log('TopRatedShelters: Setting properties:', data.properties);
+          console.log("TopRatedShelters: Setting properties:", data.properties);
           setTopProperties(data.properties);
         } else {
-          console.log('TopRatedShelters: No properties found or error in response');
+          console.log(
+            "TopRatedShelters: No properties found or error in response"
+          );
         }
       } catch (error) {
-        console.error('TopRatedShelters: Error fetching top rated properties:', error);
+        console.error(
+          "TopRatedShelters: Error fetching top rated properties:",
+          error
+        );
       }
       setLoading(false);
     };
@@ -94,25 +109,34 @@ const TopRatedShelters = () => {
       <div className="home-properties-grid">
         {topProperties.map((property) => {
           const rating = property.adminReview?.rating || 0;
-          const ratingStars = "★".repeat(Math.floor(rating)) + "☆".repeat(5 - Math.floor(rating));
+          const ratingStars =
+            "★".repeat(Math.floor(rating)) + "☆".repeat(5 - Math.floor(rating));
 
           return (
             <Link
               key={property._id}
               to={`/property/${property._id}`}
               className="home-property-card"
-              style={{ textDecoration: 'none', color: 'inherit' }}
+              style={{ textDecoration: "none", color: "inherit" }}
             >
               <img
-                src={property.propertyImage || 'https://placehold.co/250x150?text=Property+Image'}
+                src={
+                  property.propertyImage ||
+                  "https://placehold.co/250x150?text=Property+Image"
+                }
                 alt={property.title}
                 onError={(e) => {
-                  e.target.src = 'https://placehold.co/250x150?text=Property+Image';
+                  e.target.src =
+                    "https://placehold.co/250x150?text=Property+Image";
                 }}
               />
               <h4>{property.title}</h4>
-              <p>Location: {property.landmark}, {property.pincode}</p>
-              <p>Rating: {ratingStars} ({rating.toFixed(1)})</p>
+              <p>
+                Location: {property.landmark}, {property.pincode}
+              </p>
+              <p>
+                Rating: {ratingStars} ({rating.toFixed(1)})
+              </p>
             </Link>
           );
         })}
