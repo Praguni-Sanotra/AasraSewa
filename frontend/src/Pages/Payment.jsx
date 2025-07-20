@@ -87,7 +87,28 @@ const PropertyPage = () => {
         const fetchedProperty = result.data.property;
         setProperty(fetchedProperty);
 
-        // Create Stripe Payment Intent
+        // If property is free, book directly
+        if (fetchedProperty.pricePerNight === 0) {
+          const bookResult = await apiService.bookFreeProperty(fetchedProperty._id);
+          if (bookResult.success) {
+            toast.success("✅ Accommodation Confirmed!", {
+              position: "top-center",
+              autoClose: 2500,
+            });
+            setTimeout(() => {
+              navigate("/accommodation", {
+                state: { property: fetchedProperty },
+              });
+            }, 2500);
+            return;
+          } else {
+            setError(bookResult.error || "Booking failed");
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Create Stripe Payment Intent for paid properties
         const paymentIntent = await apiService.createPaymentIntent(
           fetchedProperty._id,
           fetchedProperty.pricePerNight
@@ -132,6 +153,7 @@ const PropertyPage = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error || !property) return <div>{error || "Property not found."}</div>;
+  if (property.pricePerNight === 0 && !error) return null; // Only blank if no error
   if (!clientSecret) return <div>Preparing payment...</div>;
 
   return (

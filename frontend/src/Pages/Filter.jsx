@@ -219,6 +219,7 @@ const Filter = () => {
               <p><strong>👥 Capacity:</strong> {prop.capacity} people</p>
               <p><strong>💰 Cost:</strong> ₹{prop.pricePerNight === 0 ? "Free" : prop.pricePerNight}</p>
               <p><strong>📊 Status:</strong> <span className={`status-${prop.status}`}>{prop.status}</span></p>
+              <p><strong>Booking:</strong> <span className={`status-badge ${prop.isBooked ? "booked" : "free"}`} style={{ marginLeft: 6 }}>{prop.isBooked ? "Booked" : "Available for Book"}</span></p>
             </div>
           ))
         ) : (

@@ -1,5 +1,4 @@
 .payment-page {
-  min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
   display: flex;
@@ -30,10 +29,10 @@
 
 .property-summary {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 30px;
-  display: flex;
-  gap: 20px;
-  align-items: center;
+    padding: 30px;
+    gap: 20px;
+    display: flex;
+    align-items: center;
 }
 
 .property-summary img {
@@ -46,6 +45,7 @@
 
 .property-details {
   flex: 1;
+  min-height:auto;
 }
 
 .property-details h3 {

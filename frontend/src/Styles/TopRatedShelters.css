@@ -71,6 +71,31 @@
   font-size: 1.1rem;
 }
 
+/* Booking Status Circle */
+.booking-status-circle {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-left: 8px;
+  border: 2px solid #fff;
+  vertical-align: middle;
+}
+.booking-status-circle.booked {
+  background: #e57373;
+}
+.booking-status-circle.available {
+  background: #81c784;
+}
+
+/* Center align title and circle */
+.home-property-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .home-properties-title {

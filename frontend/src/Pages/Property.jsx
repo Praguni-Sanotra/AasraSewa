@@ -1,20 +1,7 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 import "./../Styles/Filter.css";
-
-const dummyProperties = [
-  { id: 1, title: "Villa Serenity", capacity: 3, disasterFree: true, location: "Delhi", img: "https://placehold.co/250x150?text=Villa+1", cost: 1500 },
-  { id: 2, title: "Haven Nest", capacity: 5, disasterFree: true, location: "Mumbai", img: "https://placehold.co/250x150?text=Villa+2", cost: 2200 },
-  { id: 3, title: "Sunshine Home", capacity: 2, disasterFree: false, location: "Pune", img: "https://placehold.co/250x150?text=Villa+3", cost: 0 },
-  { id: 4, title: "Harmony House", capacity: 6, disasterFree: true, location: "Chennai", img: "https://placehold.co/250x150?text=Villa+4", cost: 3000 },
-  { id: 5, title: "Cozy Cottage", capacity: 4, disasterFree: false, location: "Bangalore", img: "https://placehold.co/250x150?text=Villa+5", cost: 1800 },
-  { id: 6, title: "Urban Apartment", capacity: 2, disasterFree: true, location: "Hyderabad", img: "https://placehold.co/250x150?text=Villa+6", cost: 1200 },
-  { id: 7, title: "Lakeview Bungalow", capacity: 8, disasterFree: true, location: "Udaipur", img: "https://placehold.co/250x150?text=Villa+7", cost: 3500 },
-  { id: 8, title: "Mountain Retreat", capacity: 5, disasterFree: false, location: "Manali", img: "https://placehold.co/250x150?text=Villa+8", cost: 2700 },
-  { id: 9, title: "Garden Villa", capacity: 4, disasterFree: true, location: "Goa", img: "https://placehold.co/250x150?text=Villa+9", cost: 2100 },
-  { id: 10, title: "Seaside Cottage", capacity: 3, disasterFree: false, location: "Kerala", img: "https://placehold.co/250x150?text=Villa+10", cost: 1600 },
-  { id: 11, title: "Test Villa", capacity: 10, disasterFree: true, location: "Test City", img: "https://placehold.co/250x150?text=Villa+11", cost: 1000 },
-];
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -34,6 +21,9 @@ const Property = () => {
   };
 
   const itemsPerPage = 10;
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Reset page to 1 if filters change (avoid empty page)
@@ -41,33 +31,39 @@ const Property = () => {
     setCurrentPage(1);
   }, [filters.minMembers, filters.maxCost, filters.onlyDisasterFree, filters.onlyFree, filters.sortByCost]);
 
-  const filteredProperties = useMemo(() => {
-    let result = dummyProperties.filter((house) => {
-      const isFreeMatch = !filters.onlyFree || house.cost === 0;
-      return (
-        house.capacity >= filters.minMembers &&
-        house.cost <= filters.maxCost &&
-        (!filters.onlyDisasterFree || house.disasterFree) &&
-        isFreeMatch
-      );
-    });
-
-    if (filters.sortByCost === "low") {
-      result.sort((a, b) => a.cost - b.cost);
-    } else if (filters.sortByCost === "high") {
-      result.sort((a, b) => b.cost - a.cost);
-    }
-
-    return result;
-  }, [filters]);
+  useEffect(() => {
+    const fetchProperties = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const params = {
+          members: filters.minMembers,
+          maxCost: filters.maxCost,
+          minCost: 0,
+          sort: filters.sortByCost,
+          onlyFree: filters.onlyFree,
+        };
+        const result = await apiService.getApprovedProperties(params);
+        if (result.success) {
+          setProperties(result.data.properties || []);
+        } else {
+          setError(result.error || "Failed to load properties");
+        }
+      } catch (err) {
+        setError("Failed to load properties");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperties();
+  }, [filters.minMembers, filters.maxCost, filters.onlyDisasterFree, filters.onlyFree, filters.sortByCost]);
 
   // Pagination slice
-  const paginatedProperties = filteredProperties.slice(
+  const paginatedProperties = properties.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+  const totalPages = Math.ceil(properties.length / itemsPerPage);
 
   const handleCardClick = (id) => {
     navigate(`/property/${id}`);
@@ -77,26 +73,40 @@ const Property = () => {
     <div className="results">
       <h2>Filtered Property Results</h2>
 
-      <div className="results-grid">
-        {paginatedProperties.length > 0 ? (
-          paginatedProperties.map((prop) => (
-            <div
-              key={prop.id}
-              className="result-card"
-              onClick={() => handleCardClick(prop.id)}
-              style={{ cursor: "pointer" }}
-            >
-              <img src={prop.img} alt={prop.title} />
-              <h3>{prop.title}</h3>
-              <p>Location: {prop.location}</p>
-              <p>Capacity: {prop.capacity} people</p>
-              <p>Cost: ₹{prop.cost}</p>
-            </div>
-          ))
-        ) : (
-          <p>No suitable properties found.</p>
-        )}
-      </div>
+      {loading ? (
+        <div>Loading properties...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div className="results-grid">
+          {paginatedProperties.length > 0 ? (
+            paginatedProperties.map((prop, idx) => (
+              <div
+                key={prop._id}
+                className="result-card"
+                style={{ cursor: "pointer" }}
+              >
+                <img src={prop.propertyImage || "https://placehold.co/250x150?text=Property"} alt={prop.title} />
+                <h3>{prop.title}
+                  <span className={`status-badge ${prop.isBooked ? "booked" : "free"}`} style={{ marginLeft: 10 }}>
+                    {prop.isBooked ? "Booked" : "Available"}
+                  </span>
+                </h3>
+                <p>Location: {prop.landmark}</p>
+                <p>Capacity: {prop.capacity} people</p>
+                <p>Cost: ₹{prop.pricePerNight === 0 ? "Free" : prop.pricePerNight}</p>
+                {!prop.isBooked && (
+                  <button className="rent-btn" onClick={() => handleCardClick(prop._id)}>
+                    Rent
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No suitable properties found.</p>
+          )}
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div

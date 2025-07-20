@@ -108,7 +108,7 @@ const PaymentHistory = () => {
             {payments.map((payment) => (
               <div key={payment._id} className="payment-card">
                 <div className="payment-header">
-                  <h3>{payment.property?.title || "Property"}</h3>
+                  <h3>{payment.propertyId?.title || "Property"}</h3>
                   <span className={`status-badge ${getStatusColor(payment.status)}`}>
                     {payment.status.toUpperCase()}
                   </span>
@@ -117,8 +117,8 @@ const PaymentHistory = () => {
                 <div className="payment-details">
                   <div className="property-image">
                     <img 
-                      src={payment.property?.propertyImage || "/placeholder-property.jpg"} 
-                      alt={payment.property?.title || "Property"}
+                      src={payment.propertyId?.propertyImage || "/placeholder-property.jpg"} 
+                      alt={payment.propertyId?.title || "Property"}
                     />
                   </div>
                   

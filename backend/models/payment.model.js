@@ -22,6 +22,12 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: "pending",
     },
+    paymentMethod: {
+      type: String,
+    },
+    paidAt: {
+      type: Date,
+    },
     // ...other fields
   },
   { timestamps: true }

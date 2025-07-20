@@ -60,6 +60,11 @@ function DropdownButton({ open, setOpen }) {
     }
   };
 
+  const handlePaymentHistory = () => {
+    setOpen(false);
+    navigate("/payment-history");
+  };
+
   return (
     <div className="dropdown-wrapper">
       <button className="icon-button" onClick={() => setOpen((prev) => !prev)}>
@@ -68,6 +73,9 @@ function DropdownButton({ open, setOpen }) {
       {open && (
         <div className="dropdown-menu">
           <ul className="dropdown-list">
+            <li className="dropdown-item" onClick={handlePaymentHistory}>
+              Payment History
+            </li>
             <li className="dropdown-item">Help Center</li>
             <li className="dropdown-item">Settings</li>
             <li className="dropdown-item logout" onClick={handleLogout}>

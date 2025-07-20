@@ -130,7 +130,13 @@ const TopRatedShelters = () => {
                     "https://placehold.co/250x150?text=Property+Image";
                 }}
               />
-              <h4>{property.title}</h4>
+              <h4 className="home-property-title-row">
+                {property.title}
+                <span
+                  className={`booking-status-circle ${property.isBooked ? "booked" : "available"}`}
+                  title={property.isBooked ? 'Booked' : 'Available'}
+                />
+              </h4>
               <p>
                 Location: {property.landmark}, {property.pincode}
               </p>

@@ -5,6 +5,7 @@ import {
   getPaymentStatus,
   getPaymentHistory,
   webhookHandler,
+  bookFreeProperty,
 } from "../controllers/payment.controller.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 
@@ -31,5 +32,8 @@ router.get("/status/:paymentId", getPaymentStatus);
 
 // Get payment history
 router.get("/history", getPaymentHistory);
+
+// Book free property
+router.post("/book-free", isAuthenticated, bookFreeProperty);
 
 export default router;

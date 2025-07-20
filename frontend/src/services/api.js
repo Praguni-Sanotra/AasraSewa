@@ -258,6 +258,19 @@ class ApiService {
       };
     }
   }
+
+  // Book a free property (no payment)
+  async bookFreeProperty(propertyId) {
+    try {
+      const res = await api.post("/api/v1/payment/book-free", { propertyId });
+      return { success: true, data: res.data };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.response?.data?.message || "Booking failed",
+      };
+    }
+  }
 }
 
 export default new ApiService();

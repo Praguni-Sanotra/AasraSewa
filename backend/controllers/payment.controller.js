@@ -20,6 +20,15 @@ export const createPaymentIntent = async (req, res) => {
       return res.status(500).json({ message: "Stripe not initialized" });
     }
 
+    // Check if property is already booked
+    const property = await Property.findById(propertyId);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+    if (property.isBooked) {
+      return res.status(400).json({ message: "Property is already booked" });
+    }
+
     // Try to find existing pending payment for this user and property
     let payment = await Payment.findOne({
       user: userId,
@@ -88,6 +97,21 @@ export const confirmPayment = async (req, res) => {
       });
     }
 
+    // Check if property is already booked
+    const property = await Property.findById(payment.propertyId);
+    if (!property) {
+      return res.status(404).json({
+        message: "Property not found",
+        success: false,
+      });
+    }
+    if (property.isBooked) {
+      return res.status(400).json({
+        message: "Property is already booked",
+        success: false,
+      });
+    }
+
     // Update payment status
     payment.status = "paid";
     payment.paymentMethod = paymentMethod;
@@ -95,11 +119,8 @@ export const confirmPayment = async (req, res) => {
     await payment.save();
 
     // Update property booking status
-    const property = await Property.findById(payment.property);
-    if (property) {
-      property.isBooked = true;
-      await property.save();
-    }
+    property.isBooked = true;
+    await property.save();
 
     res.status(200).json({
       message: "Payment confirmed successfully",
@@ -157,7 +178,7 @@ export const getPaymentHistory = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
 
     const payments = await Payment.find({ user: userId })
-      .populate("property", "title propertyImage")
+      .populate("propertyId", "title propertyImage")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -228,4 +249,54 @@ export const webhookHandler = async (req, res) => {
   }
 
   res.json({ received: true });
+};
+
+export const bookFreeProperty = async (req, res) => {
+  try {
+    const userId = req.id;
+    const { propertyId } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: User not found" });
+    }
+    if (!propertyId) {
+      return res.status(400).json({ message: "Property ID is required" });
+    }
+
+    // Check property exists and is not already booked
+    const property = await Property.findById(propertyId);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+    if (property.isBooked) {
+      return res.status(400).json({ message: "Property is already booked" });
+    }
+    if (property.pricePerNight !== 0) {
+      return res.status(400).json({ message: "Property is not free" });
+    }
+
+    // Create a payment record with status 'paid' (for record-keeping)
+    const payment = new Payment({
+      user: userId,
+      propertyId: property._id,
+      amount: 0,
+      status: "paid",
+      paymentMethod: "free",
+      paidAt: new Date(),
+    });
+    await payment.save();
+
+    // Mark property as booked
+    property.isBooked = true;
+    await property.save();
+
+    return res.status(200).json({
+      message: "Free property booked successfully!",
+      paymentId: payment._id,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error booking free property:", error);
+    return res.status(500).json({ message: "Server error while booking free property" });
+  }
 };

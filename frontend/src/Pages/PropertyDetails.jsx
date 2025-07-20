@@ -183,6 +183,7 @@ const PropertyDetails = () => {
           <p><Mail style={{ marginRight: "6px" }} /> <strong>Contact:</strong> {property.createdBy?.email || 'N/A'}</p>
           <p><Phone style={{ marginRight: "6px" }} /> <strong>Phone:</strong> {property.createdBy?.phone || 'N/A'}</p>
           <p><CheckCircle style={{ marginRight: "6px" }} /> <strong>Status:</strong> <span className={`status-${property.status}`}>{property.status}</span></p>
+          <p><strong>Booking:</strong> <span className={`status-badge ${property.isBooked ? "booked" : "free"}`} style={{ marginLeft: 6 }}>{property.isBooked ? "Booked" : "Available for Book"}</span></p>
           <p><Star style={{ marginRight: "6px" }} /> <strong>Rating:</strong> {property.star}/5</p>
 
           {property.createdBy && (
@@ -197,9 +198,11 @@ const PropertyDetails = () => {
       </div>
 
       <div className="action-buttons">
-        <button className="rent-btn" onClick={handleRentClick}>
-          Rent
-        </button>
+        {!property.isBooked && (
+          <button className="rent-btn" onClick={handleRentClick}>
+            Rent
+          </button>
+        )}
         <button className="transport-btn" onClick={handleTransportClick}>
           Book Transport
         </button>
