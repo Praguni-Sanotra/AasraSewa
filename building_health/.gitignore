@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Python environments
 env/
 venv/
@@ -38,7 +37,3 @@ processed_images/
 # Temp/test files
 .temp/
 *.cache
-=======
-.env
-.env/
->>>>>>> d39ecafc5e287c027907a6c3b60849c13bf46702
