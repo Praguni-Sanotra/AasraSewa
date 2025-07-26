@@ -21,6 +21,30 @@ const userSchema = new mongoose.Schema(
     },
     face: { type: String },
     isHost: { type: Boolean, default: false },
+    // Emergency Contact
+    emergencyContact: {
+      phone: { type: String },
+      state: { type: String },
+    },
+    // Location
+    location: {
+      house: { type: String },
+      street: { type: String },
+      area: { type: String },
+      city: { type: String },
+      pincode: { type: String },
+      landmark: { type: String },
+      coordinates: { type: String },
+      sharing: { type: Boolean, default: false },
+    },
+    // Medical Info
+    medical: {
+      problem: { type: String },
+      doctor: { type: String },
+      medicines: { type: String },
+      allergies: { type: String },
+      chronicDiseases: { type: String },
+    },
   },
   {
     timestamps: true,

@@ -230,11 +230,47 @@ export const updateUser = async (req, res) => {
     const userId = req.id;
     const updates = req.body;
 
-    const forbiddenFields = ["password", "email", "_id", "isHost"];
+    const forbiddenFields = ["email", "_id", "isHost"];
     for (const key of Object.keys(updates)) {
       if (forbiddenFields.includes(key)) {
         return res.status(400).json({
           message: `You are not allowed to update '${key}' field.`,
+          success: false,
+        });
+      }
+    }
+
+    // Validate nested fields for new settings
+    if (updates.emergencyContact) {
+      if (updates.emergencyContact.phone && !/^\d{10}$/.test(updates.emergencyContact.phone)) {
+        return res.status(400).json({
+          message: "Emergency contact phone must be exactly 10 digits",
+          success: false,
+        });
+      }
+      if (updates.emergencyContact.state && typeof updates.emergencyContact.state !== "string") {
+        return res.status(400).json({
+          message: "Emergency contact state must be a string",
+          success: false,
+        });
+      }
+    }
+
+    if (updates.location) {
+      if (updates.location.pincode && !/^\d{6}$/.test(updates.location.pincode)) {
+        return res.status(400).json({
+          message: "Pincode must be exactly 6 digits",
+          success: false,
+        });
+      }
+      // Optionally validate coordinates, city, etc.
+    }
+
+    if (updates.medical) {
+      // Optionally validate medical fields (e.g., age, bloodGroup, etc.)
+      if (updates.medical.bloodGroup && !BLOOD_GROUPS.includes(updates.medical.bloodGroup)) {
+        return res.status(400).json({
+          message: "Invalid blood group in medical info",
           success: false,
         });
       }
