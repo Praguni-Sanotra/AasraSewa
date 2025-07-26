@@ -18,8 +18,8 @@ const PaymentHistory = () => {
   const fetchPaymentHistory = async () => {
     try {
       setLoading(true);
-      const result = await apiService.getPaymentHistory(currentPage, 10);
-      
+      const result = await apiService.getPaymentHistory(currentPage, 5);
+
       if (result.success) {
         setPayments(result.data.payments);
         setTotalPages(result.data.totalPages);
@@ -58,7 +58,34 @@ const PaymentHistory = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const maxButtons = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let end = Math.min(totalPages, start + maxButtons - 1);
+
+    if (end - start < maxButtons - 1) {
+      start = Math.max(1, end - maxButtons + 1);
+    }
+
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`page-button ${i === currentPage ? "active" : ""}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return pages;
   };
 
   if (loading) {
@@ -76,12 +103,6 @@ const PaymentHistory = () => {
     <div className="payment-history-page">
       <div className="history-header">
         <h2>Payment History</h2>
-        <button 
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
-          ← Back
-        </button>
       </div>
 
       {error && (
@@ -113,7 +134,7 @@ const PaymentHistory = () => {
                     {payment.status.toUpperCase()}
                   </span>
                 </div>
-                
+
                 <div className="payment-details">
                   <div className="property-image">
                     <img 
@@ -121,7 +142,7 @@ const PaymentHistory = () => {
                       alt={payment.propertyId?.title || "Property"}
                     />
                   </div>
-                  
+
                   <div className="payment-info">
                     <p><strong>Amount:</strong> ₹{payment.amount}</p>
                     <p><strong>Date:</strong> {formatDate(payment.createdAt)}</p>
@@ -138,25 +159,23 @@ const PaymentHistory = () => {
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div className="pagination-payment">
               <button
                 className="page-button"
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
-                Previous
+                ← Prev
               </button>
-              
-              <span className="page-info">
-                Page {currentPage} of {totalPages}
-              </span>
-              
+
+              {renderPageNumbers()}
+
               <button
                 className="page-button"
                 disabled={currentPage === totalPages}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
-                Next
+                Next →
               </button>
             </div>
           )}
@@ -166,4 +185,4 @@ const PaymentHistory = () => {
   );
 };
 
-export default PaymentHistory; 
+export default PaymentHistory;

@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { ToastContainer } from "react-toastify";
+
 // Component Imports
 import Header from "./Components/Header";
 import HeroSection from "./Components/HeroSection";
@@ -25,7 +26,14 @@ import PaymentHistory from "./Pages/PaymentHistory";
 import Accommodation from "./Pages/Accommodation";
 import Transport from "./Pages/Transport";
 import FaceVerificationPage from "./Pages/FaceVerificationPage";
-import EmergencyPage from "./Pages/Emergency"; // ✅ NEW IMPORT
+import EmergencyPage from "./Pages/Emergency";
+import Setting from "./Pages/setting/setting";
+
+// Settings Subpages
+import Account from "./Pages/setting/account";
+import EmergencyContact from "./Pages/setting/emergency";
+import LocationSettings from "./Pages/setting/location";
+import Medical from "./Pages/setting/medical";
 
 import ProtectedRoute from "./auth/ProtectedRoutes.jsx";
 
@@ -119,8 +127,6 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
-
-          {/* ✅ Emergency Page Route (Protected) */}
           <Route
             path="/emergency"
             element={
@@ -129,19 +135,52 @@ const Layout = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Setting />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/emergency-contact"
+            element={
+              <ProtectedRoute>
+                <EmergencyContact />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/location"
+            element={
+              <ProtectedRoute>
+                <LocationSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medical"
+            element={
+              <ProtectedRoute>
+                <Medical />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* ✅ Face Verification Route (Public) */}
           <Route path="/face-verification" element={<FaceVerificationPage />} />
-
-          {/* Redirect from old route */}
           <Route path="/explore" element={<Navigate to="/home" replace />} />
-
-          {/* 404 Not Found */}
           <Route
             path="*"
-            element={
-              <h2 style={{ textAlign: "center" }}>404 - Page Not Found</h2>
-            }
+            element={<h2 style={{ textAlign: "center" }}>404 - Page Not Found</h2>}
           />
         </Routes>
       </main>

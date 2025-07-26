@@ -1,0 +1,153 @@
+.location-section-page {
+  max-width: 600px;
+  margin: 100px auto;
+  padding: 36px 28px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.location-section-heading {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #1e3a8a;
+}
+
+.location-section-subheading {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 24px;
+  color: #4b5563;
+}
+
+.location-section-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.location-section-options input[type="text"],
+.location-section-options input[type="number"] {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transition: 0.3s ease;
+  box-sizing: border-box;
+}
+
+.location-section-options input::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.location-section-options input:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Autofill fix */
+.location-section-options input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+}
+
+.location-section-btn {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.location-section-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.25);
+}
+
+.location-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.location-section-toggle label {
+  font-size: 16px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.location-section-toggle input[type="checkbox"] {
+  width: 40px;
+  height: 20px;
+  border-radius: 9999px;
+  appearance: none;
+  background: #d1d5db;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.location-section-toggle input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 1px;
+  left: 1px;
+  border-radius: 9999px;
+  background: white;
+  transition: transform 0.3s ease;
+}
+
+.location-section-toggle input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+}
+
+.location-section-toggle input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+}
+
+/* Status message */
+.location-section-status {
+  font-size: 14px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Responsive tweak */
+@media (max-width: 480px) {
+  .location-section-page {
+    margin: 60px 16px;
+    padding: 28px 20px;
+  }
+
+  .location-section-btn {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .location-section-toggle {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+}

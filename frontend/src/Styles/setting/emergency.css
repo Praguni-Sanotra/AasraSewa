@@ -1,0 +1,90 @@
+/* Scrollable full-page layout */
+.emergency-wrapper {
+  min-height: 100vh;
+  overflow-y: auto;
+  padding-top: 100px; /* Adjust for fixed header */
+  background-color: transparent; /* Removed light blue background */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Main container box */
+.emergency-page {
+  max-width: 600px;
+  width: 100%;
+  margin: 20px;
+  padding: 32px 24px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Title */
+.emergency-page h2 {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+  color: #1e3a8a; /* Deep blue */
+}
+
+/* Subtitle text */
+.emergency-page p {
+  font-size: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #4b5563;
+}
+
+/* Input and Select field styling */
+.emergency-page input,
+.emergency-page select {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background-color: #f9fafb;
+  margin-bottom: 20px;
+  color: #000000;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus effect */
+.emergency-page input:focus,
+.emergency-page select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+  outline: none;
+}
+
+/* Button styling */
+.emergency-page button {
+  width: 100%;
+  padding: 14px 18px;
+  background: linear-gradient(to right, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.emergency-page button:hover {
+  background: linear-gradient(to right, #1d4ed8, #2563eb);
+  transform: translateY(-1px);
+}
+
+/* Error message styling */
+.emergency-page p.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}

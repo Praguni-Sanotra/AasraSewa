@@ -20,7 +20,6 @@ function LanguageButton() {
   const handleSelect = (lang) => {
     setSelectedLanguage(lang);
     setOpen(false);
-    // Optionally save to localStorage
     localStorage.setItem("preferredLanguage", lang);
   };
 
@@ -47,7 +46,7 @@ function LanguageButton() {
 
 function DropdownButton({ open, setOpen }) {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -55,7 +54,6 @@ function DropdownButton({ open, setOpen }) {
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if logout fails, redirect to login
       navigate("/login");
     }
   };
@@ -63,6 +61,11 @@ function DropdownButton({ open, setOpen }) {
   const handlePaymentHistory = () => {
     setOpen(false);
     navigate("/payment-history");
+  };
+
+  const handleSettings = () => {
+    setOpen(false);
+    navigate("/settings"); // ✅ Navigate to the Setting page
   };
 
   return (
@@ -77,7 +80,9 @@ function DropdownButton({ open, setOpen }) {
               Payment History
             </li>
             <li className="dropdown-item">Help Center</li>
-            <li className="dropdown-item">Settings</li>
+            <li className="dropdown-item" onClick={handleSettings}>
+              Settings
+            </li>
             <li className="dropdown-item logout" onClick={handleLogout}>
               Logout
             </li>
