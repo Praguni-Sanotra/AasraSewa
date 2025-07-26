@@ -3,126 +3,127 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
-  background-color: #f8fafc;
+  padding: 3rem 1rem;
+  background-color: #f1f5f9; /* Softer gray-blue background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .host-container {
   background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
-  color: #000000;
+  color: #111827;
+  transition: all 0.3s ease;
 }
 
 .host-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.25rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 0.25rem;
-  color: #000000;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
 }
 
 .highlight {
-  color: #3b82f6;
+  color: #2563eb;
 }
 
 .host-subtitle {
   text-align: center;
-  color: #000000;
-  margin-bottom: 1.5rem;
+  color: #475569;
+  margin-bottom: 2rem;
   font-size: 1rem;
+  line-height: 1.6;
 }
 
 .host-form input,
-.host-form textarea {
+.host-form textarea,
+.host-form select {
   width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #d1d5db;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   font-size: 1rem;
-  background-color: #ffffff;
-  color: #000000;
-  outline: none;
-  transition: border-color 0.3s ease;
+  background-color: #fff;
+  color: #0f172a;
+  transition: 0.3s ease;
 }
 
 .host-form input:focus,
-.host-form textarea:focus {
+.host-form textarea:focus,
+.host-form select:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  outline: none;
 }
 
 .host-form textarea {
-  resize: none;
+  resize: vertical;
+  min-height: 100px;
 }
 
 .image-upload-section label,
 .wall-label {
-  display: block;
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 0.5rem;
-  color: #000000;
+  color: #1e293b;
 }
 
 .image-upload-section input[type="file"] {
   margin-bottom: 1rem;
-  font-size: 0.9rem;
-  color: #000000;
+  font-size: 0.95rem;
 }
 
 .image-preview-box {
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  display: inline-block;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   margin: 10px 0;
 }
 
 .image-preview-box img {
   width: 100%;
-  height: 80px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 12px;
 }
 
 .image-preview-box button {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background: #ffffffcc;
+  top: 6px;
+  right: 6px;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
-  color: #ef4444;
-  font-weight: bold;
-  padding: 0.25rem 0.5rem;
+  color: #dc2626;
+  padding: 0.4rem;
   border-radius: 50%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 14px;
+  transition: background 0.2s ease;
 }
 
 .image-preview-box button:hover {
   background: #dc2626;
+  color: #fff;
 }
 
 .aadhaar-preview-container {
   position: relative;
   display: inline-block;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 
 .aadhaar-preview-container img {
-  max-width: 200px;
+  max-width: 220px;
   max-height: 150px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 2px solid #e5e7eb;
 }
 
@@ -131,7 +132,7 @@
   top: -8px;
   right: -8px;
   background: #ef4444;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 50%;
   width: 24px;
@@ -149,16 +150,16 @@
 
 .submit-button {
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.95rem;
   background: linear-gradient(to right, #2563eb, #3b82f6);
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.1rem;
   border: none;
   border-radius: 14px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
 }
 
 .submit-button:hover {
@@ -167,46 +168,47 @@
 }
 
 .submit-button:disabled {
-  background-color: #ccc;
+  background-color: #cbd5e1;
   cursor: not-allowed;
 }
 
 .host-form input:disabled,
 .host-form textarea:disabled,
 .host-form select:disabled {
-  background-color: #f5f5f5;
+  background-color: #f1f5f9;
   cursor: not-allowed;
 }
 
 .error-message {
-  background-color: #fee;
-  color: #c33;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #fcc;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
   text-align: center;
+  font-weight: 500;
 }
 
 .checkbox-container {
   display: flex;
   align-items: center;
-  margin: 15px 0;
+  margin: 18px 0;
 }
 
 .checkbox-container label {
-  display: flex;
-  align-items: center;
+  font-size: 15px;
+  color: #1e293b;
+  margin-left: 10px;
   cursor: pointer;
-  font-size: 14px;
 }
 
 .checkbox-container input[type="checkbox"] {
-  margin-right: 8px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  accent-color: #3b82f6;
 }
 
 .property-image-upload {
-  margin: 10px 0;
+  margin: 15px 0;
 }
