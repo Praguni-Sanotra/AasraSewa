@@ -51,10 +51,10 @@ function DropdownButton({ open, setOpen }) {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/login");
+      navigate("/home"); // ✅ Navigate to Home.jsx after logout
     } catch (error) {
       console.error("Logout error:", error);
-      navigate("/login");
+      navigate("/home"); // ✅ Fallback to Home.jsx
     }
   };
 
@@ -65,7 +65,7 @@ function DropdownButton({ open, setOpen }) {
 
   const handleSettings = () => {
     setOpen(false);
-    navigate("/settings"); // ✅ Navigate to the Setting page
+    navigate("/settings");
   };
 
   return (
@@ -101,10 +101,18 @@ export default function Header() {
     navigate("/host");
   };
 
+  const handleLogoClick = () => {
+    navigate("/home"); // ✅ Navigate directly to Home.jsx
+  };
+
   return (
     <header className="header">
       <div className="header-container">
-        <div className="logo-wrapper">
+        <div
+          className="logo-wrapper"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer" }}
+        >
           <img
             src={logo}
             alt="Logo"
